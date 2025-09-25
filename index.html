@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Tools - macOS Style</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="macos-window">
+        <div class="title-bar">
+            <div class="traffic-lights">
+                <div class="traffic-light close"></div>
+                <div class="traffic-light minimize"></div>
+                <div class="traffic-light maximize"></div>
+            </div>
+            <div class="title">Cryptography Tools</div>
+        </div>
+
+        <div class="window-content">
+            <header class="app-header">
+                <h1>Program Kriptografi</h1>
+                <p class="subtitle">Kelompok 8</p>
+            </header>
+
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="shift">
+                        <span class="tab-icon">⇄</span>
+                        <span class="tab-label">Shift</span>
+                    </button>
+                    <button class="tab-button" data-tab="substitution">
+                        <span class="tab-icon">↔</span>
+                        <span class="tab-label">Substitution</span>
+                    </button>
+                    <button class="tab-button" data-tab="affine">
+                        <span class="tab-icon">ƒ</span>
+                        <span class="tab-label">Affine</span>
+                    </button>
+                    <button class="tab-button" data-tab="vigenere">
+                        <span class="tab-icon">⎊</span>
+                        <span class="tab-label">Vigenere</span>
+                    </button>
+                    <button class="tab-button" data-tab="hill">
+                        <span class="tab-icon">⧉</span>
+                        <span class="tab-label">Hill</span>
+                    </button>
+                    <button class="tab-button" data-tab="permutation">
+                        <span class="tab-icon">⇆</span>
+                        <span class="tab-label">Permutation</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shift Cipher Tab -->
+            <div id="shift" class="tab-content active">
+                <div class="cipher-card">
+                    <div class="card-header">
+                        <h2>Shift Cipher</h2>
+                        <div class="pill">Caesar</div>
+                    </div>
+                    <p class="card-description">Setiap huruf digeser sejumlah kunci dalam alfabet. Contoh: kunci=3, A→D,
+                        B→E, Z→C</p>
+
+                    <div class="input-section">
+                        <label class="input-label">
+                            <span class="label-text">Plaintext/Ciphertext</span>
+                            <textarea class="macos-textarea" id="shift-text"
+                                placeholder="Masukkan teks di sini..."></textarea>
+                        </label>
+
+                        <div class="inline-inputs">
+                            <label class="input-label">
+                                <span class="label-text">Shift Key (1-25)</span>
+                                <input type="number" class="macos-input" id="shift-key" value="3" min="1" max="25">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptShift()" class="macos-button primary">
+                            <span class="button-icon">🔒</span>
+                            Enkripsi
+                        </button>
+                        <button onclick="decryptShift()" class="macos-button secondary">
+                            <span class="button-icon">🔓</span>
+                            Dekripsi
+                        </button>
+                    </div>
+
+                    <div class="result-section">
+                        <label class="input-label">
+                            <span class="label-text">Hasil</span>
+                            <textarea class="macos-textarea result" id="shift-result" readonly
+                                placeholder="Hasil akan muncul di sini..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Substitution Cipher Tab -->
+            <div id="substitution" class="tab-content">
+                <div class="cipher-card">
+                    <div class="card-header">
+                        <h2>Substitution Cipher</h2>
+                        <div class="pill">Monoalphabetic</div>
+                    </div>
+                    <p class="card-description">Setiap huruf diganti dengan huruf lain berdasarkan mapping kunci. Kunci
+                        harus berupa 26 huruf unik.</p>
+
+                    <div class="input-section">
+                        <label class="input-label">
+                            <span class="label-text">Plaintext/Ciphertext</span>
+                            <textarea class="macos-textarea" id="substitution-text"
+                                placeholder="Masukkan teks di sini..."></textarea>
+                        </label>
+
+                        <label class="input-label">
+                            <span class="label-text">Substitution Key (26 unique letters)</span>
+                            <input type="text" class="macos-input" id="substitution-key"
+                                value="ZYXWVUTSRQPONMLKJIHGFEDCBA" maxlength="26">
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptSubstitution()" class="macos-button primary">
+                            <span class="button-icon">🔒</span>
+                            Enkripsi
+                        </button>
+                        <button onclick="decryptSubstitution()" class="macos-button secondary">
+                            <span class="button-icon">🔓</span>
+                            Dekripsi
+                        </button>
+                    </div>
+
+                    <div class="result-section">
+                        <label class="input-label">
+                            <span class="label-text">Hasil</span>
+                            <textarea class="macos-textarea result" id="substitution-result" readonly
+                                placeholder="Hasil akan muncul di sini..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Affine Cipher Tab -->
+            <div id="affine" class="tab-content">
+                <div class="cipher-card">
+                    <div class="card-header">
+                        <h2>Affine Cipher</h2>
+                        <div class="pill">Linear</div>
+                    </div>
+                    <p class="card-description">Enkripsi menggunakan rumus C = (a×P + b) mod 26. Kunci a harus coprime
+                        dengan 26.</p>
+
+                    <div class="input-section">
+                        <label class="input-label">
+                            <span class="label-text">Plaintext/Ciphertext</span>
+                            <textarea class="macos-textarea" id="affine-text"
+                                placeholder="Masukkan teks di sini..."></textarea>
+                        </label>
+
+                        <div class="inline-inputs">
+                            <label class="input-label">
+                                <span class="label-text">Key a (coprime with 26)</span>
+                                <input type="number" class="macos-input" id="affine-key-a" value="5" min="1" max="25">
+                            </label>
+                            <label class="input-label">
+                                <span class="label-text">Key b (0-25)</span>
+                                <input type="number" class="macos-input" id="affine-key-b" value="8" min="0" max="25">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptAffine()" class="macos-button primary">
+                            <span class="button-icon">🔒</span>
+                            Enkripsi
+                        </button>
+                        <button onclick="decryptAffine()" class="macos-button secondary">
+                            <span class="button-icon">🔓</span>
+                            Dekripsi
+                        </button>
+                    </div>
+
+                    <div class="result-section">
+                        <label class="input-label">
+                            <span class="label-text">Hasil</span>
+                            <textarea class="macos-textarea result" id="affine-result" readonly
+                                placeholder="Hasil akan muncul di sini..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vigenere Cipher Tab -->
+            <div id="vigenere" class="tab-content">
+                <div class="cipher-card">
+                    <div class="card-header">
+                        <h2>Vigenère Cipher</h2>
+                        <div class="pill">Polyalphabetic</div>
+                    </div>
+                    <p class="card-description">Versi lanjutan dari Caesar cipher menggunakan kata kunci. Setiap huruf
+                        digeser dengan jumlah berbeda.</p>
+
+                    <div class="input-section">
+                        <label class="input-label">
+                            <span class="label-text">Plaintext/Ciphertext</span>
+                            <textarea class="macos-textarea" id="vigenere-text"
+                                placeholder="Masukkan teks di sini..."></textarea>
+                        </label>
+
+                        <label class="input-label">
+                            <span class="label-text">Keyword (letters only)</span>
+                            <input type="text" class="macos-input" id="vigenere-key" value="KEY">
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptVigenere()" class="macos-button primary">
+                            <span class="button-icon">🔒</span>
+                            Enkripsi
+                        </button>
+                        <button onclick="decryptVigenere()" class="macos-button secondary">
+                            <span class="button-icon">🔓</span>
+                            Dekripsi
+                        </button>
+                    </div>
+
+                    <div class="result-section">
+                        <label class="input-label">
+                            <span class="label-text">Hasil</span>
+                            <textarea class="macos-textarea result" id="vigenere-result" readonly
+                                placeholder="Hasil akan muncul di sini..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hill Cipher Tab -->
+            <div id="hill" class="tab-content">
+                <div class="cipher-card">
+                    <div class="card-header">
+                        <h2>Hill Cipher</h2>
+                        <div class="pill">Matrix</div>
+                    </div>
+                    <p class="card-description">Menggunakan matriks sebagai kunci. Pesan dibagi menjadi blok-blok.
+                        Determinan matriks harus coprime dengan 26.</p>
+
+                    <div class="input-section">
+                        <label class="input-label">
+                            <span class="label-text">Plaintext/Ciphertext</span>
+                            <textarea class="macos-textarea" id="hill-text"
+                                placeholder="Masukkan teks di sini..."></textarea>
+                        </label>
+
+                        <div class="matrix-input">
+                            <span class="label-text">Matrix Key 2×2</span>
+                            <div class="matrix-grid">
+                                <input type="number" class="macos-input matrix-cell" id="hill-key-1" value="5">
+                                <input type="number" class="macos-input matrix-cell" id="hill-key-2" value="8">
+                                <input type="number" class="macos-input matrix-cell" id="hill-key-3" value="17">
+                                <input type="number" class="macos-input matrix-cell" id="hill-key-4" value="3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptHill()" class="macos-button primary">
+                            <span class="button-icon">🔒</span>
+                            Enkripsi
+                        </button>
+                        <button onclick="decryptHill()" class="macos-button secondary">
+                            <span class="button-icon">🔓</span>
+                            Dekripsi
+                        </button>
+                    </div>
+
+                    <div class="result-section">
+                        <label class="input-label">
+                            <span class="label-text">Hasil</span>
+                            <textarea class="macos-textarea result" id="hill-result" readonly
+                                placeholder="Hasil akan muncul di sini..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permutation Cipher Tab -->
+            <div id="permutation" class="tab-content">
+                <div class="cipher-card">
+                    <div class="card-header">
+                        <h2>Permutation Cipher</h2>
+                        <div class="pill">Transposition</div>
+                    </div>
+                    <p class="card-description">Mengubah urutan huruf berdasarkan kunci permutasi. Pesan ditulis dalam
+                        matriks, dibaca per kolom.</p>
+
+                    <div class="input-section">
+                        <label class="input-label">
+                            <span class="label-text">Plaintext/Ciphertext</span>
+                            <textarea class="macos-textarea" id="permutation-text"
+                                placeholder="Masukkan teks di sini..."></textarea>
+                        </label>
+
+                        <label class="input-label">
+                            <span class="label-text">Permutation Key (e.g., 3,1,2)</span>
+                            <input type="text" class="macos-input" id="permutation-key" value="3,1,2"
+                                placeholder="a,b,c,...">
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptPermutation()" class="macos-button primary">
+                            <span class="button-icon">🔒</span>
+                            Enkripsi
+                        </button>
+                        <button onclick="decryptPermutation()" class="macos-button secondary">
+                            <span class="button-icon">🔓</span>
+                            Dekripsi
+                        </button>
+                    </div>
+
+                    <div class="result-section">
+                        <label class="input-label">
+                            <span class="label-text">Hasil</span>
+                            <textarea class="macos-textarea result" id="permutation-result" readonly
+                                placeholder="Hasil akan muncul di sini..."></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
