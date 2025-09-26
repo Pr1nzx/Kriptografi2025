@@ -413,6 +413,8 @@ function setupFileInputListeners() {
     "vigenere",
     "hill",
     "permutation",
+    "playfair",
+    "otp",
   ];
 
   cipherTypes.forEach((type) => {
@@ -1313,6 +1315,380 @@ async function decryptPermutation() {
   }
 }
 
+// ------------------------- PLAYFAIR (5x5 grid, I=J) -------------------------
+function buildPlayfairMatrix(keyword) {
+  const alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; // 25 huruf, tanpa J
+  keyword = (keyword || "").toUpperCase().replace(/[^A-Z]/g, "").replace(/J/g, "I");
+  let used = new Set();
+  let seq = "";
+
+  // add keyword letters first (unique, with J->I rule)
+  for (let ch of keyword) {
+    if (ch === "J") ch = "I";
+    if (!used.has(ch) && alphabet.includes(ch)) {
+      used.add(ch);
+      seq += ch;
+    }
+  }
+  // add remaining letters
+  for (let ch of alphabet) {
+    if (!used.has(ch)) {
+      used.add(ch);
+      seq += ch;
+    }
+  }
+
+  // build 5x5 matrix
+  const size = 5;
+  const matrix = [];
+  let idx = 0;
+  for (let r = 0; r < size; r++) {
+    const row = [];
+    for (let c = 0; c < size; c++) {
+      row.push(seq[idx++] || "X");
+    }
+    matrix.push(row);
+  }
+  return { matrix, size };
+}
+
+function findPos(matrix, size, ch) {
+  if (ch === "J") ch = "I"; // treat J as I
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (matrix[r][c] === ch) return { r, c };
+    }
+  }
+  return null;
+}
+
+function preparePlayfairPairs(text) {
+  let cleaned = text.toUpperCase().replace(/[^A-Z]/g, "").replace(/J/g, "I");
+  let pairs = [];
+  let i = 0;
+  while (i < cleaned.length) {
+    let a = cleaned[i];
+    let b = cleaned[i + 1];
+    if (!b) {
+      pairs.push([a, "X"]);
+      i += 1;
+    } else if (a === b) {
+      pairs.push([a, "X"]);
+      i += 1;
+    } else {
+      pairs.push([a, b]);
+      i += 2;
+    }
+  }
+  return pairs;
+}
+
+function playfairProcess(text, keyword, encrypt = true, preserveNonAlpha = false) {
+  const { matrix, size } = buildPlayfairMatrix(keyword);
+  const pairs = preparePlayfairPairs(text);
+
+  const resultLetters = [];
+  for (const pair of pairs) {
+    const [A, B] = pair;
+    const posA = findPos(matrix, size, A);
+    const posB = findPos(matrix, size, B);
+    if (!posA || !posB) continue;
+
+    if (posA.r === posB.r) {
+      // same row
+      if (encrypt) {
+        resultLetters.push(matrix[posA.r][(posA.c + 1) % size]);
+        resultLetters.push(matrix[posB.r][(posB.c + 1) % size]);
+      } else {
+        resultLetters.push(matrix[posA.r][(posA.c - 1 + size) % size]);
+        resultLetters.push(matrix[posB.r][(posB.c - 1 + size) % size]);
+      }
+    } else if (posA.c === posB.c) {
+      // same column
+      if (encrypt) {
+        resultLetters.push(matrix[(posA.r + 1) % size][posA.c]);
+        resultLetters.push(matrix[(posB.r + 1) % size][posB.c]);
+      } else {
+        resultLetters.push(matrix[(posA.r - 1 + size) % size][posA.c]);
+        resultLetters.push(matrix[(posB.r - 1 + size) % size][posB.c]);
+      }
+    } else {
+      // rectangle swap
+      resultLetters.push(matrix[posA.r][posB.c]);
+      resultLetters.push(matrix[posB.r][posA.c]);
+    }
+  }
+
+  if (preserveNonAlpha) {
+    // reinsert non-letters
+    const up = text.toUpperCase();
+    let out = "";
+    let letterIdx = 0;
+    for (let i = 0; i < up.length; i++) {
+      let ch = up[i];
+      if (/[A-Z]/.test(ch)) {
+        if (ch === "J") ch = "I";
+        out += resultLetters[letterIdx++] || "";
+      } else {
+        out += ch;
+      }
+    }
+    return out;
+  } else {
+    return resultLetters.join("");
+  }
+}
+
+async function encryptPlayfair() {
+  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("playfair", "primary");
+  setButtonLoading(button, true);
+  try {
+    const inputData = await getInputContent("playfair");
+    const preserve = document.getElementById("playfair-preserve")?.checked ?? false;
+    const key = document.getElementById("playfair-key").value || "";
+
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
+    if (inputData.isFile && inputData.fileType === "binary") {
+      showError("Playfair hanya mendukung teks, bukan binary");
+      return;
+    }
+
+    const res = playfairProcess(inputData.content, key, true, preserve);
+    const ta = document.getElementById("playfair-result");
+    ta.value = res;
+    ta.dataset.isFile = inputData.isFile.toString();
+    ta.dataset.fileType = "text";
+    ta.dataset.originalFilename = inputData.filename || "";
+    addSuccessAnimation(ta);
+  } catch (err) {
+    showError("Error Playfair: " + err.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+async function decryptPlayfair() {
+  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("playfair", "secondary");
+  setButtonLoading(button, true);
+  try {
+    const inputData = await getInputContent("playfair");
+    const preserve = document.getElementById("playfair-preserve")?.checked ?? false;
+    const key = document.getElementById("playfair-key").value || "";
+
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
+    if (inputData.isFile && inputData.fileType === "binary") {
+      showError("Playfair hanya mendukung teks, bukan binary");
+      return;
+    }
+
+    const res = playfairProcess(inputData.content, key, false, preserve);
+    const ta = document.getElementById("playfair-result");
+    ta.value = res;
+    ta.dataset.isFile = inputData.isFile.toString();
+    ta.dataset.fileType = "text";
+    ta.dataset.originalFilename = inputData.filename || "";
+    addSuccessAnimation(ta);
+  } catch (err) {
+    showError("Error Playfair: " + err.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+// ------------------------- ONE-TIME PAD (fixed: output letters-only) -------------------------
+async function readOTPKeyLetters(fileInput) {
+  if (!fileInput || fileInput.files.length === 0) return [];
+  try {
+    const fileData = await readFileContent(fileInput.files[0]); // util existing
+    // hanya ambil huruf A-Z
+    const letters = (fileData.content || "").toUpperCase().replace(/[^A-Z]/g, "").split("");
+    return letters;
+  } catch (err) {
+    throw new Error("Gagal baca key file: " + err.message);
+  }
+}
+
+// core: apply OTP on a string that is already only A-Z
+function applyOTPOnLettersOnly(lettersOnlyText, keyLetters, encrypt = true) {
+  const outArr = [];
+  let keyIdx = 0;
+  for (let i = 0; i < lettersOnlyText.length; i++) {
+    const ch = lettersOnlyText[i];
+    if (keyIdx >= keyLetters.length) {
+      throw new Error("Kunci tidak cukup panjang untuk pesan (butuh lebih banyak huruf di file kunci)");
+    }
+    const p = ch.charCodeAt(0) - 65;
+    const k = keyLetters[keyIdx].charCodeAt(0) - 65;
+    const c = encrypt ? (p + k) % 26 : (p - k + 26) % 26;
+    outArr.push(String.fromCharCode(c + 65));
+    keyIdx++;
+  }
+  return outArr.join("");
+}
+
+async function encryptOTP() {
+  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("otp", "primary");
+  setButtonLoading(button, true);
+  try {
+    const inputData = await getInputContent("otp");
+    const keyFileInput = document.getElementById("otp-key-file");
+
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
+    if (!keyFileInput || keyFileInput.files.length === 0) {
+      showError("Pilih file kunci (teks) terlebih dahulu");
+      return;
+    }
+
+    // 1. Bersihkan plaintext dari non-huruf, TAPI PERTAHANKAN CASE ASLINYA
+    const plaintext = inputData.content.replace(/[^a-zA-Z]/g, '');
+
+    // 2. Bersihkan dan ubah kunci menjadi uppercase
+    const keyData = await readFileContent(keyFileInput.files[0]);
+    const key = keyData.content.toUpperCase().replace(/[^A-Z]/g, '');
+
+    if (plaintext.length === 0) {
+      throw new Error("Teks input tidak mengandung huruf untuk dienkripsi.");
+    }
+    if (key.length < plaintext.length) {
+      throw new Error(`Kunci tidak cukup panjang. Dibutuhkan ${plaintext.length} huruf, tersedia ${key.length}.`);
+    }
+
+    let result = "";
+    for (let i = 0; i < plaintext.length; i++) {
+      const p_char = plaintext[i];
+      const k_val = key.charCodeAt(i) - 65; // Nilai kunci (0-25)
+
+      // Tentukan base ASCII ('A' atau 'a') berdasarkan case plaintext
+      const p_base = (p_char === p_char.toUpperCase()) ? 65 : 97;
+      const p_val = p_char.charCodeAt(0) - p_base;
+
+      // Lakukan enkripsi
+      const c_val = (p_val + k_val) % 26;
+
+      // Gabungkan kembali dengan base untuk mempertahankan case
+      result += String.fromCharCode(c_val + p_base);
+    }
+
+    const ta = document.getElementById("otp-result");
+    ta.value = result;
+    ta.dataset.isFile = "false";
+    ta.dataset.fileType = "text";
+    ta.dataset.originalFilename = inputData.filename || "";
+    addSuccessAnimation(ta);
+
+  } catch (err) {
+    showError("Error Enkripsi: " + err.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+async function decryptOTP() {
+  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("otp", "secondary");
+  setButtonLoading(button, true);
+  try {
+    const inputData = await getInputContent("otp");
+    const keyFileInput = document.getElementById("otp-key-file");
+
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
+    if (!keyFileInput || keyFileInput.files.length === 0) {
+      showError("Pilih file kunci (teks) terlebih dahulu");
+      return;
+    }
+
+    // 1. Bersihkan ciphertext dari non-huruf, TAPI PERTAHANKAN CASE ASLINYA
+    const ciphertext = inputData.content.replace(/[^a-zA-Z]/g, '');
+    
+    // 2. Bersihkan dan ubah kunci menjadi uppercase
+    const keyData = await readFileContent(keyFileInput.files[0]);
+    const key = keyData.content.toUpperCase().replace(/[^A-Z]/g, '');
+
+    if (ciphertext.length === 0) {
+      throw new Error("Teks input tidak mengandung huruf untuk didekripsi.");
+    }
+    if (key.length < ciphertext.length) {
+      throw new Error(`Kunci tidak cukup panjang. Dibutuhkan ${ciphertext.length} huruf, tersedia ${key.length}.`);
+    }
+
+    let result = "";
+    for (let i = 0; i < ciphertext.length; i++) {
+      const c_char = ciphertext[i];
+      const k_val = key.charCodeAt(i) - 65;
+
+      // Tentukan base ASCII ('A' atau 'a') berdasarkan case ciphertext
+      const c_base = (c_char === c_char.toUpperCase()) ? 65 : 97;
+      const c_val = c_char.charCodeAt(0) - c_base;
+
+      // Lakukan dekripsi
+      const p_val = (c_val - k_val + 26) % 26;
+      
+      // Gabungkan kembali dengan base untuk mempertahankan case
+      result += String.fromCharCode(p_val + c_base);
+    }
+
+    const ta = document.getElementById("otp-result");
+    ta.value = result;
+    ta.dataset.isFile = "false";
+    ta.dataset.fileType = "text";
+    ta.dataset.originalFilename = inputData.filename || "";
+    addSuccessAnimation(ta);
+    
+  } catch (err) {
+    showError("Error Dekripsi: " + err.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+// ------------------------- file input listeners for new inputs -------------------------
+function setupExtraFileInputs() {
+  const ids = [
+    { file: "playfair-file", info: "playfair-file-info", text: "playfair-text" },
+    { file: "otp-file", info: "otp-file-info", text: "otp-text" },
+    { file: "otp-key-file", info: "otp-key-file-info", text: null }
+  ];
+  ids.forEach(x => {
+    const el = document.getElementById(x.file);
+    const info = document.getElementById(x.info);
+    const textInput = x.text ? document.getElementById(x.text) : null;
+    if (el && info) {
+      el.addEventListener("change", function () {
+        if (this.files.length > 0) {
+          const f = this.files[0];
+          const ft = getFileType(f.name);
+          info.innerHTML = `<span>${f.name}</span> <span class="file-type-badge">${ft}</span> <span class="file-size">${formatFileSize(f.size)}</span>`;
+          info.classList.add("has-file");
+          if (textInput) {
+            textInput.value = "";
+            textInput.placeholder = "File selected. Text input disabled.";
+            textInput.disabled = true;
+          }
+        } else {
+          info.textContent = "No file selected";
+          info.classList.remove("has-file");
+          if (textInput) {
+            textInput.disabled = false;
+            textInput.placeholder = "Masukkan teks di sini...";
+          }
+        }
+      });
+    }
+  });
+}
+
+
 // Add macOS-style interactions & init defaults
 document.addEventListener("DOMContentLoaded", function () {
   // Apply default preserve settings
@@ -1356,4 +1732,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Setup file input listeners
   setupFileInputListeners();
+  setupExtraFileInputs();
 });
