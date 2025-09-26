@@ -83,12 +83,12 @@ function applyPreserveDefaults() {
     const cb = getPreserveCheckbox(tabId);
     if (cb) {
       cb.checked = !!preserveDefaults[tabId];
-      
+
       // DIPERBAIKI: Sembunyikan checkbox untuk hill dan permutation
-      if (tabId === 'hill' || tabId === 'permutation') {
-        const label = cb.closest('label');
+      if (tabId === "hill" || tabId === "permutation") {
+        const label = cb.closest("label");
         if (label) {
-          label.style.display = 'none';
+          label.style.display = "none";
         }
       }
     }
@@ -104,10 +104,10 @@ function saveResult(cipherType) {
   }
 
   // Get metadata from the result textarea's data attributes
-  const isFile = resultTextarea.dataset.isFile === 'true';
-  const fileType = resultTextarea.dataset.fileType || 'text';
+  const isFile = resultTextarea.dataset.isFile === "true";
+  const fileType = resultTextarea.dataset.fileType || "text";
   const originalFilename = resultTextarea.dataset.originalFilename;
-  
+
   saveResultWithType(cipherType, resultTextarea.value, isFile, fileType, originalFilename);
 }
 
@@ -268,22 +268,22 @@ function addSuccessAnimation(element) {
 
 // File handling utilities
 function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) return "0 Bytes";
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
 
 function getFileType(filename) {
-  const ext = filename.split('.').pop().toLowerCase();
-  const textTypes = ['txt', 'md', 'csv', 'json', 'xml', 'html', 'css', 'js'];
-  return textTypes.includes(ext) ? 'text' : 'binary';
+  const ext = filename.split(".").pop().toLowerCase();
+  const textTypes = ["txt", "md", "csv", "json", "xml", "html", "css", "js"];
+  return textTypes.includes(ext) ? "text" : "binary";
 }
 
 // Convert ArrayBuffer to Base64 for binary files
 function arrayBufferToBase64(buffer) {
-  let binary = '';
+  let binary = "";
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
@@ -308,32 +308,32 @@ async function readFileContent(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     const fileType = getFileType(file.name);
-    
-    reader.onload = function(e) {
-      if (fileType === 'text') {
+
+    reader.onload = function (e) {
+      if (fileType === "text") {
         resolve({
           content: e.target.result,
-          type: 'text',
+          type: "text",
           filename: file.name,
-          size: file.size
+          size: file.size,
         });
       } else {
         // For binary files, convert to base64
         const base64 = arrayBufferToBase64(e.target.result);
         resolve({
           content: base64,
-          type: 'binary',
+          type: "binary",
           filename: file.name,
-          size: file.size
+          size: file.size,
         });
       }
     };
-    
-    reader.onerror = function() {
-      reject(new Error('Failed to read file'));
+
+    reader.onerror = function () {
+      reject(new Error("Failed to read file"));
     };
-    
-    if (fileType === 'text') {
+
+    if (fileType === "text") {
       reader.readAsText(file);
     } else {
       reader.readAsArrayBuffer(file);
@@ -345,7 +345,7 @@ async function readFileContent(file) {
 async function getInputContent(tabId) {
   const fileInput = document.getElementById(`${tabId}-file`);
   const textInput = document.getElementById(`${tabId}-text`);
-  
+
   if (fileInput && fileInput.files.length > 0) {
     try {
       const fileData = await readFileContent(fileInput.files[0]);
@@ -354,46 +354,46 @@ async function getInputContent(tabId) {
         isFile: true,
         fileType: fileData.type,
         filename: fileData.filename,
-        size: fileData.size
+        size: fileData.size,
       };
     } catch (error) {
-      throw new Error('Failed to read file: ' + error.message);
+      throw new Error("Failed to read file: " + error.message);
     }
   } else {
     return {
       content: textInput.value,
       isFile: false,
-      fileType: 'text',
+      fileType: "text",
       filename: null,
-      size: 0
+      size: 0,
     };
   }
 }
 
 // Save result with proper handling for binary files
 function saveResultWithType(cipherType, content, isFile, fileType, originalFilename) {
-  if (!content || (typeof content === 'string' && !content.trim())) {
+  if (!content || (typeof content === "string" && !content.trim())) {
     showError("Tidak ada hasil untuk disimpan");
     return;
   }
 
   let blob;
   let filename;
-  
-  if (isFile && fileType === 'binary') {
+
+  if (isFile && fileType === "binary") {
     // Convert base64 back to binary
     const arrayBuffer = base64ToArrayBuffer(content);
-    blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
-    const ext = originalFilename ? originalFilename.split('.').pop() : 'bin';
+    blob = new Blob([arrayBuffer], { type: "application/octet-stream" });
+    const ext = originalFilename ? originalFilename.split(".").pop() : "bin";
     filename = `cipher_result_${cipherType}.${ext}`;
   } else {
     // Text content
-    blob = new Blob([content], { type: 'text/plain' });
+    blob = new Blob([content], { type: "text/plain" });
     filename = `cipher_result_${cipherType}.txt`;
   }
-  
+
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
@@ -406,41 +406,48 @@ function saveResultWithType(cipherType, content, isFile, fileType, originalFilen
 
 // Add file input event listeners
 function setupFileInputListeners() {
-  const cipherTypes = ['shift', 'substitution', 'affine', 'vigenere', 'hill', 'permutation'];
-  
-  cipherTypes.forEach(type => {
+  const cipherTypes = [
+    "shift",
+    "substitution",
+    "affine",
+    "vigenere",
+    "hill",
+    "permutation",
+  ];
+
+  cipherTypes.forEach((type) => {
     const fileInput = document.getElementById(`${type}-file`);
     const fileInfo = document.getElementById(`${type}-file-info`);
     const textInput = document.getElementById(`${type}-text`);
-    
+
     if (fileInput && fileInfo) {
-      fileInput.addEventListener('change', function() {
+      fileInput.addEventListener("change", function () {
         if (this.files.length > 0) {
           const file = this.files[0];
           const fileType = getFileType(file.name);
           const size = formatFileSize(file.size);
-          
+
           fileInfo.innerHTML = `
             <span>${file.name}</span>
             <span class="file-type-badge">${fileType}</span>
             <span class="file-size">${size}</span>
           `;
-          fileInfo.classList.add('has-file');
-          
+          fileInfo.classList.add("has-file");
+
           // Clear text input when file is selected
           if (textInput) {
-            textInput.value = '';
-            textInput.placeholder = 'File selected. Text input disabled.';
+            textInput.value = "";
+            textInput.placeholder = "File selected. Text input disabled.";
             textInput.disabled = true;
           }
         } else {
-          fileInfo.textContent = 'No file selected';
-          fileInfo.classList.remove('has-file');
-          
+          fileInfo.textContent = "No file selected";
+          fileInfo.classList.remove("has-file");
+
           // Re-enable text input when no file
           if (textInput) {
             textInput.disabled = false;
-            textInput.placeholder = 'Masukkan teks di sini...';
+            textInput.placeholder = "Masukkan teks di sini...";
           }
         }
       });
@@ -452,15 +459,17 @@ function setupFileInputListeners() {
 
 // DIPERBAIKI: Shift Cipher with file support
 async function encryptShift() {
-  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("shift", "primary");
+  const button =
+    (typeof event !== "undefined" && event && event.target) ||
+    getButtonFor("shift", "primary");
   setButtonLoading(button, true);
 
   try {
-    const inputData = await getInputContent('shift');
+    const inputData = await getInputContent("shift");
     const key = parseInt(document.getElementById("shift-key").value);
     const preserveNonAlpha = getPreserveCheckbox("shift")?.checked ?? false;
 
-    if (!inputData.content || (typeof inputData.content === 'string' && !inputData.content.trim())) {
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
       showError("Masukkan teks atau pilih file terlebih dahulu");
       return;
     }
@@ -473,7 +482,7 @@ async function encryptShift() {
     let result = "";
     let contentToProcess = inputData.content;
 
-    if (inputData.isFile && inputData.fileType === 'binary') {
+    if (inputData.isFile && inputData.fileType === "binary") {
       // For binary files, work with base64 string
       for (let char of contentToProcess) {
         const charCode = char.charCodeAt(0);
@@ -495,12 +504,12 @@ async function encryptShift() {
 
     const resultTextarea = document.getElementById("shift-result");
     resultTextarea.value = result;
-    
+
     // Store metadata for saving
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || '';
-    
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
     addSuccessAnimation(resultTextarea);
   } catch (error) {
     showError("Terjadi kesalahan saat enkripsi: " + error.message);
@@ -510,15 +519,17 @@ async function encryptShift() {
 }
 
 async function decryptShift() {
-  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("shift", "secondary");
+  const button =
+    (typeof event !== "undefined" && event && event.target) ||
+    getButtonFor("shift", "secondary");
   setButtonLoading(button, true);
 
   try {
-    const inputData = await getInputContent('shift');
+    const inputData = await getInputContent("shift");
     const key = parseInt(document.getElementById("shift-key").value);
     const preserveNonAlpha = getPreserveCheckbox("shift")?.checked ?? false;
 
-    if (!inputData.content || (typeof inputData.content === 'string' && !inputData.content.trim())) {
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
       showError("Masukkan teks atau pilih file terlebih dahulu");
       return;
     }
@@ -531,7 +542,7 @@ async function decryptShift() {
     let result = "";
     let contentToProcess = inputData.content;
 
-    if (inputData.isFile && inputData.fileType === 'binary') {
+    if (inputData.isFile && inputData.fileType === "binary") {
       // For binary files, work with base64 string
       for (let char of contentToProcess) {
         const charCode = char.charCodeAt(0);
@@ -553,12 +564,12 @@ async function decryptShift() {
 
     const resultTextarea = document.getElementById("shift-result");
     resultTextarea.value = result;
-    
+
     // Store metadata for saving
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || '';
-    
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
     addSuccessAnimation(resultTextarea);
   } catch (error) {
     showError("Terjadi kesalahan saat dekripsi: " + error.message);
@@ -571,15 +582,17 @@ async function decryptShift() {
 // For brevity, I'll show the pattern for substitution cipher as well
 
 async function encryptSubstitution() {
-  const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("substitution", "primary");
+  const button =
+    (typeof event !== "undefined" && event && event.target) ||
+    getButtonFor("substitution", "primary");
   setButtonLoading(button, true);
 
   try {
-    const inputData = await getInputContent('substitution');
+    const inputData = await getInputContent("substitution");
     const key = document.getElementById("substitution-key").value.toUpperCase();
     const preserveNonAlpha = getPreserveCheckbox("substitution")?.checked ?? false;
 
-    if (!inputData.content || (typeof inputData.content === 'string' && !inputData.content.trim())) {
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
       showError("Masukkan teks atau pilih file terlebih dahulu");
       return;
     }
@@ -592,7 +605,7 @@ async function encryptSubstitution() {
     let result = "";
     let contentToProcess = inputData.content;
 
-    if (inputData.isFile && inputData.fileType === 'binary') {
+    if (inputData.isFile && inputData.fileType === "binary") {
       // For binary files, apply substitution to each byte
       for (let char of contentToProcess) {
         const charCode = char.charCodeAt(0);
@@ -614,12 +627,12 @@ async function encryptSubstitution() {
 
     const resultTextarea = document.getElementById("substitution-result");
     resultTextarea.value = result;
-    
+
     // Store metadata for saving
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || '';
-    
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
     addSuccessAnimation(resultTextarea);
   } catch (error) {
     showError("Terjadi kesalahan saat enkripsi: " + error.message);
@@ -628,40 +641,40 @@ async function encryptSubstitution() {
   }
 }
 
-function decryptSubstitution() {
+async function decryptSubstitution() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("substitution", "secondary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("substitution-text").value;
-      const key = document
-        .getElementById("substitution-key")
-        .value.toUpperCase();
+  try {
+    const inputData = await getInputContent("substitution");
+    const key = document.getElementById("substitution-key").value.toUpperCase();
+    const preserveNonAlpha = getPreserveCheckbox("substitution")?.checked ?? false;
 
-      const preserveNonAlpha =
-        getPreserveCheckbox("substitution")?.checked ?? false;
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
 
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
+    if (key.length !== 26 || !/^[A-Z]+$/.test(key) || new Set(key).size !== 26) {
+      showError("Kunci harus berupa 26 huruf unik (A-Z)");
+      return;
+    }
+
+    let result = "";
+    let contentToProcess = inputData.content;
+
+    if (inputData.isFile && inputData.fileType === "binary") {
+      // For binary files, reverse substitution
+      for (let char of contentToProcess) {
+        const charCode = char.charCodeAt(0);
+        const mappedCode = (charCode - key.charCodeAt(charCode % 26) + 65 + 256) % 256;
+        result += String.fromCharCode(mappedCode);
       }
-
-      if (
-        key.length !== 26 ||
-        !/^[A-Z]+$/.test(key) ||
-        new Set(key).size !== 26
-      ) {
-        showError("Kunci harus berupa 26 huruf unik (A-Z)");
-        return;
-      }
-
-      let result = "";
-
-      const cleanTextValue = cleanText(text, preserveNonAlpha);
-
+    } else {
+      // Text processing
+      const cleanTextValue = cleanText(contentToProcess, preserveNonAlpha);
       for (let char of cleanTextValue) {
         if (char >= "A" && char <= "Z") {
           const index = key.indexOf(char);
@@ -670,51 +683,65 @@ function decryptSubstitution() {
           result += char;
         }
       }
-
-      document.getElementById("substitution-result").value = result;
-      addSuccessAnimation(document.getElementById("substitution-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat dekripsi");
-    } finally {
-      setButtonLoading(button, false);
     }
-  }, 300);
+
+    const resultTextarea = document.getElementById("substitution-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = inputData.fileType;
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat dekripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-// DIPERBAIKI: Affine Cipher dengan opsi pertahankan karakter non-alphabet
-function encryptAffine() {
+// DIPERBAIKI: Affine Cipher dengan file support
+async function encryptAffine() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("affine", "primary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("affine-text").value;
-      const a = parseInt(document.getElementById("affine-key-a").value);
-      const b = parseInt(document.getElementById("affine-key-b").value);
+  try {
+    const inputData = await getInputContent("affine");
+    const a = parseInt(document.getElementById("affine-key-a").value);
+    const b = parseInt(document.getElementById("affine-key-b").value);
+    const preserveNonAlpha = getPreserveCheckbox("affine")?.checked ?? false;
 
-      const preserveNonAlpha = getPreserveCheckbox("affine")?.checked ?? false;
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
 
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
+    if (gcd(a, 26) !== 1) {
+      showError("Kunci a harus coprime dengan 26 (gcd(a,26)=1)");
+      return;
+    }
+
+    if (b < 0 || b > 25) {
+      showError("Kunci b harus antara 0 dan 25");
+      return;
+    }
+
+    let result = "";
+    let contentToProcess = inputData.content;
+
+    if (inputData.isFile && inputData.fileType === "binary") {
+      // For binary files, apply affine transformation to each byte
+      for (let char of contentToProcess) {
+        const charCode = char.charCodeAt(0);
+        const transformed = (a * charCode + b) % 256;
+        result += String.fromCharCode(transformed);
       }
-
-      if (gcd(a, 26) !== 1) {
-        showError("Kunci a harus coprime dengan 26 (gcd(a,26)=1)");
-        return;
-      }
-
-      if (b < 0 || b > 25) {
-        showError("Kunci b harus antara 0 dan 25");
-        return;
-      }
-
-      let result = "";
-
-      const cleanTextValue = cleanText(text, preserveNonAlpha);
-
+    } else {
+      // Text processing
+      const cleanTextValue = cleanText(contentToProcess, preserveNonAlpha);
       for (let char of cleanTextValue) {
         if (char >= "A" && char <= "Z") {
           const p = char.charCodeAt(0) - 65;
@@ -724,56 +751,76 @@ function encryptAffine() {
           result += char;
         }
       }
-
-      document.getElementById("affine-result").value = result;
-      addSuccessAnimation(document.getElementById("affine-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat enkripsi");
-    } finally {
-      setButtonLoading(button, false);
     }
-  }, 300);
+
+    const resultTextarea = document.getElementById("affine-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = inputData.fileType;
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat enkripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-function decryptAffine() {
+async function decryptAffine() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("affine", "secondary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("affine-text").value;
-      const a = parseInt(document.getElementById("affine-key-a").value);
-      const b = parseInt(document.getElementById("affine-key-b").value);
+  try {
+    const inputData = await getInputContent("affine");
+    const a = parseInt(document.getElementById("affine-key-a").value);
+    const b = parseInt(document.getElementById("affine-key-b").value);
+    const preserveNonAlpha = getPreserveCheckbox("affine")?.checked ?? false;
 
-      const preserveNonAlpha = getPreserveCheckbox("affine")?.checked ?? false;
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
 
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
+    if (gcd(a, 26) !== 1) {
+      showError("Kunci a harus coprime dengan 26 (gcd(a,26)=1)");
+      return;
+    }
+
+    if (b < 0 || b > 25) {
+      showError("Kunci b harus antara 0 dan 25");
+      return;
+    }
+
+    let result = "";
+    let contentToProcess = inputData.content;
+
+    if (inputData.isFile && inputData.fileType === "binary") {
+      // For binary files, apply inverse affine transformation
+      const a_inv = modInverse(a, 256);
+      if (a_inv === null) {
+        showError("Tidak dapat menemukan invers modular untuk kunci a");
         return;
       }
 
-      if (gcd(a, 26) !== 1) {
-        showError("Kunci a harus coprime dengan 26 (gcd(a,26)=1)");
-        return;
+      for (let char of contentToProcess) {
+        const charCode = char.charCodeAt(0);
+        const transformed = (a_inv * (charCode - b + 256)) % 256;
+        result += String.fromCharCode(transformed);
       }
-
-      if (b < 0 || b > 25) {
-        showError("Kunci b harus antara 0 dan 25");
-        return;
-      }
-
+    } else {
+      // Text processing
       const a_inv = modInverse(a, 26);
       if (a_inv === null) {
         showError("Tidak dapat menemukan invers modular untuk kunci a");
         return;
       }
 
-      let result = "";
-
-      const cleanTextValue = cleanText(text, preserveNonAlpha);
-
+      const cleanTextValue = cleanText(contentToProcess, preserveNonAlpha);
       for (let char of cleanTextValue) {
         if (char >= "A" && char <= "Z") {
           const c = char.charCodeAt(0) - 65;
@@ -783,50 +830,62 @@ function decryptAffine() {
           result += char;
         }
       }
-
-      document.getElementById("affine-result").value = result;
-      addSuccessAnimation(document.getElementById("affine-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat dekripsi");
-    } finally {
-      setButtonLoading(button, false);
     }
-  }, 300);
+
+    const resultTextarea = document.getElementById("affine-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = inputData.fileType;
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat dekripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-// DIPERBAIKI: Vigenere Cipher dengan opsi pertahankan karakter non-alphabet
-function encryptVigenere() {
+// DIPERBAIKI: Vigenere Cipher dengan file support
+async function encryptVigenere() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("vigenere", "primary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("vigenere-text").value;
-      let key = document
-        .getElementById("vigenere-key")
-        .value.toUpperCase()
-        .replace(/[^A-Z]/g, "");
+  try {
+    const inputData = await getInputContent("vigenere");
+    let key = document.getElementById("vigenere-key").value.toUpperCase().replace(/[^A-Z]/g, "");
+    const preserveNonAlpha = getPreserveCheckbox("vigenere")?.checked ?? false;
 
-      const preserveNonAlpha =
-        getPreserveCheckbox("vigenere")?.checked ?? false;
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
 
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
+    if (!key) {
+      showError("Kunci harus mengandung setidaknya satu huruf");
+      return;
+    }
+
+    let result = "";
+    let keyIndex = 0;
+    let contentToProcess = inputData.content;
+
+    if (inputData.isFile && inputData.fileType === "binary") {
+      // For binary files, use key bytes cyclically
+      for (let char of contentToProcess) {
+        const charCode = char.charCodeAt(0);
+        const keyChar = key.charCodeAt(keyIndex % key.length) - 65;
+        const encrypted = (charCode + keyChar) % 256;
+        result += String.fromCharCode(encrypted);
+        keyIndex++;
       }
-
-      if (!key) {
-        showError("Kunci harus mengandung setidaknya satu huruf");
-        return;
-      }
-
-      let result = "";
-      let keyIndex = 0;
-
-      const cleanTextValue = cleanText(text, preserveNonAlpha);
-
+    } else {
+      // Text processing
+      const cleanTextValue = cleanText(contentToProcess, preserveNonAlpha);
       for (let char of cleanTextValue) {
         if (char >= "A" && char <= "Z") {
           const p = char.charCodeAt(0) - 65;
@@ -836,52 +895,63 @@ function encryptVigenere() {
           keyIndex++;
         } else if (preserveNonAlpha) {
           result += char;
-          // Tidak increment keyIndex untuk karakter non-alfabet
         }
       }
-
-      document.getElementById("vigenere-result").value = result;
-      addSuccessAnimation(document.getElementById("vigenere-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat enkripsi");
-    } finally {
-      setButtonLoading(button, false);
     }
-  }, 300);
+
+    const resultTextarea = document.getElementById("vigenere-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = inputData.fileType;
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat enkripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-function decryptVigenere() {
+async function decryptVigenere() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("vigenere", "secondary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("vigenere-text").value;
-      let key = document
-        .getElementById("vigenere-key")
-        .value.toUpperCase()
-        .replace(/[^A-Z]/g, "");
+  try {
+    const inputData = await getInputContent("vigenere");
+    let key = document.getElementById("vigenere-key").value.toUpperCase().replace(/[^A-Z]/g, "");
+    const preserveNonAlpha = getPreserveCheckbox("vigenere")?.checked ?? false;
 
-      const preserveNonAlpha =
-        getPreserveCheckbox("vigenere")?.checked ?? false;
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
 
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
+    if (!key) {
+      showError("Kunci harus mengandung setidaknya satu huruf");
+      return;
+    }
+
+    let result = "";
+    let keyIndex = 0;
+    let contentToProcess = inputData.content;
+
+    if (inputData.isFile && inputData.fileType === "binary") {
+      // For binary files, use key bytes cyclically
+      for (let char of contentToProcess) {
+        const charCode = char.charCodeAt(0);
+        const keyChar = key.charCodeAt(keyIndex % key.length) - 65;
+        const decrypted = (charCode - keyChar + 256) % 256;
+        result += String.fromCharCode(decrypted);
+        keyIndex++;
       }
-
-      if (!key) {
-        showError("Kunci harus mengandung setidaknya satu huruf");
-        return;
-      }
-
-      let result = "";
-      let keyIndex = 0;
-
-      const cleanTextValue = cleanText(text, preserveNonAlpha);
-
+    } else {
+      // Text processing
+      const cleanTextValue = cleanText(contentToProcess, preserveNonAlpha);
       for (let char of cleanTextValue) {
         if (char >= "A" && char <= "Z") {
           const c = char.charCodeAt(0) - 65;
@@ -891,349 +961,356 @@ function decryptVigenere() {
           keyIndex++;
         } else if (preserveNonAlpha) {
           result += char;
-          // Tidak increment keyIndex untuk karakter non-alfabet
         }
       }
-
-      document.getElementById("vigenere-result").value = result;
-      addSuccessAnimation(document.getElementById("vigenere-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat dekripsi");
-    } finally {
-      setButtonLoading(button, false);
     }
-  }, 300);
+
+    const resultTextarea = document.getElementById("vigenere-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = inputData.fileType;
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat dekripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-// DIPERBAIKI: Hill Cipher - HILANGKAN opsi pertahankan karakter non-alphabet
-function encryptHill() {
+// DIPERBAIKI: Hill Cipher dengan file support (hanya untuk text files)
+async function encryptHill() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("hill", "primary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("hill-text").value;
-      const key1 = parseInt(document.getElementById("hill-key-1").value);
-      const key2 = parseInt(document.getElementById("hill-key-2").value);
-      const key3 = parseInt(document.getElementById("hill-key-3").value);
-      const key4 = parseInt(document.getElementById("hill-key-4").value);
+  try {
+    const inputData = await getInputContent("hill");
+    const key1 = parseInt(document.getElementById("hill-key-1").value);
+    const key2 = parseInt(document.getElementById("hill-key-2").value);
+    const key3 = parseInt(document.getElementById("hill-key-3").value);
+    const key4 = parseInt(document.getElementById("hill-key-4").value);
 
-      // DIPERBAIKI: Hill Cipher TIDAK menggunakan opsi preserveNonAlpha
-      // Langsung set ke false
-      const preserveNonAlpha = false;
-
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
-      }
-
-      // DIPERBAIKI: Hill Cipher hanya memproses huruf, tidak ada opsi preserve
-      const cleanTextValue = text.toUpperCase().replace(/[^A-Z]/g, "");
-
-      if (!cleanTextValue) {
-        showError("Teks harus mengandung huruf untuk Hill Cipher");
-        return;
-      }
-
-      const keyMatrix = [
-        [key1, key2],
-        [key3, key4],
-      ];
-      let det = (key1 * key4 - key2 * key3) % 26;
-      if (det < 0) det += 26;
-
-      if (gcd(det, 26) !== 1) {
-        showError("Determinan matriks kunci harus coprime dengan 26");
-        return;
-      }
-
-      let processedText = cleanTextValue;
-      if (processedText.length % 2 !== 0) {
-        processedText += "X";
-      }
-
-      let encryptedLetters = "";
-      for (let i = 0; i < processedText.length; i += 2) {
-        const block = [
-          processedText.charCodeAt(i) - 65,
-          processedText.charCodeAt(i + 1) - 65,
-        ];
-
-        const encryptedBlock = [
-          (keyMatrix[0][0] * block[0] + keyMatrix[0][1] * block[1]) % 26,
-          (keyMatrix[1][0] * block[0] + keyMatrix[1][1] * block[1]) % 26,
-        ];
-
-        encryptedLetters +=
-          String.fromCharCode(encryptedBlock[0] + 65) +
-          String.fromCharCode(encryptedBlock[1] + 65);
-      }
-
-      // DIPERBAIKI: Hill Cipher tidak mendukung preserve non-alpha
-      // Hasil hanya berisi huruf
-      const result = encryptedLetters;
-
-      document.getElementById("hill-result").value = result;
-      addSuccessAnimation(document.getElementById("hill-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat enkripsi");
-    } finally {
-      setButtonLoading(button, false);
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
     }
-  }, 300);
+
+    // Hill Cipher tidak mendukung binary files
+    if (inputData.isFile && inputData.fileType === "binary") {
+      showError("Hill Cipher hanya mendukung file teks, bukan file binary");
+      return;
+    }
+
+    // Hill Cipher hanya memproses huruf, tidak ada opsi preserve
+    const cleanTextValue = inputData.content.toUpperCase().replace(/[^A-Z]/g, "");
+
+    if (!cleanTextValue) {
+      showError("Teks harus mengandung huruf untuk Hill Cipher");
+      return;
+    }
+
+    const keyMatrix = [[key1, key2], [key3, key4]];
+    let det = (key1 * key4 - key2 * key3) % 26;
+    if (det < 0) det += 26;
+
+    if (gcd(det, 26) !== 1) {
+      showError("Determinan matriks kunci harus coprime dengan 26");
+      return;
+    }
+
+    let processedText = cleanTextValue;
+    if (processedText.length % 2 !== 0) {
+      processedText += "X";
+    }
+
+    let encryptedLetters = "";
+    for (let i = 0; i < processedText.length; i += 2) {
+      const block = [
+        processedText.charCodeAt(i) - 65,
+        processedText.charCodeAt(i + 1) - 65,
+      ];
+
+      const encryptedBlock = [
+        (keyMatrix[0][0] * block[0] + keyMatrix[0][1] * block[1]) % 26,
+        (keyMatrix[1][0] * block[0] + keyMatrix[1][1] * block[1]) % 26,
+      ];
+
+      encryptedLetters +=
+        String.fromCharCode(encryptedBlock[0] + 65) +
+        String.fromCharCode(encryptedBlock[1] + 65);
+    }
+
+    const resultTextarea = document.getElementById("hill-result");
+    resultTextarea.value = encryptedLetters;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text";
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat enkripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-function decryptHill() {
+async function decryptHill() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("hill", "secondary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("hill-text").value;
-      const key1 = parseInt(document.getElementById("hill-key-1").value);
-      const key2 = parseInt(document.getElementById("hill-key-2").value);
-      const key3 = parseInt(document.getElementById("hill-key-3").value);
-      const key4 = parseInt(document.getElementById("hill-key-4").value);
+  try {
+    const inputData = await getInputContent("hill");
+    const key1 = parseInt(document.getElementById("hill-key-1").value);
+    const key2 = parseInt(document.getElementById("hill-key-2").value);
+    const key3 = parseInt(document.getElementById("hill-key-3").value);
+    const key4 = parseInt(document.getElementById("hill-key-4").value);
 
-      // DIPERBAIKI: Hill Cipher TIDAK menggunakan opsi preserveNonAlpha
-      // Langsung set ke false
-      const preserveNonAlpha = false;
-
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
-      }
-
-      // DIPERBAIKI: Hill Cipher hanya memproses huruf, tidak ada opsi preserve
-      const cleanTextValue = text.toUpperCase().replace(/[^A-Z]/g, "");
-
-      if (!cleanTextValue) {
-        showError("Teks harus mengandung huruf untuk Hill Cipher");
-        return;
-      }
-
-      if (cleanTextValue.length % 2 !== 0) {
-        showError("Panjang teks huruf harus genap untuk Hill Cipher");
-        return;
-      }
-
-      const keyMatrix = [
-        [key1, key2],
-        [key3, key4],
-      ];
-      let det = (key1 * key4 - key2 * key3) % 26;
-      if (det < 0) det += 26;
-
-      if (gcd(det, 26) !== 1) {
-        showError("Determinan matriks kunci harus coprime dengan 26");
-        return;
-      }
-
-      const det_inv = modInverse(det, 26);
-      if (det_inv === null) {
-        showError("Tidak dapat menemukan invers modular untuk determinan");
-        return;
-      }
-
-      const adjugate = [
-        [key4, -key2],
-        [-key3, key1],
-      ];
-
-      const invMatrix = [
-        [(det_inv * adjugate[0][0]) % 26, (det_inv * adjugate[0][1]) % 26],
-        [(det_inv * adjugate[1][0]) % 26, (det_inv * adjugate[1][1]) % 26],
-      ];
-
-      // Ensure positive values
-      for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-          if (invMatrix[i][j] < 0) invMatrix[i][j] += 26;
-        }
-      }
-
-      let decryptedLetters = "";
-      for (let i = 0; i < cleanTextValue.length; i += 2) {
-        const block = [
-          cleanTextValue.charCodeAt(i) - 65,
-          cleanTextValue.charCodeAt(i + 1) - 65,
-        ];
-
-        const decryptedBlock = [
-          (invMatrix[0][0] * block[0] + invMatrix[0][1] * block[1]) % 26,
-          (invMatrix[1][0] * block[0] + invMatrix[1][1] * block[1]) % 26,
-        ];
-
-        decryptedLetters +=
-          String.fromCharCode(decryptedBlock[0] + 65) +
-          String.fromCharCode(decryptedBlock[1] + 65);
-      }
-
-      // DIPERBAIKI: Hill Cipher tidak mendukung preserve non-alpha
-      // Hasil hanya berisi huruf
-      const result = decryptedLetters;
-
-      document.getElementById("hill-result").value = result;
-      addSuccessAnimation(document.getElementById("hill-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat dekripsi");
-    } finally {
-      setButtonLoading(button, false);
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
     }
-  }, 300);
+
+    // Hill Cipher tidak mendukung binary files
+    if (inputData.isFile && inputData.fileType === "binary") {
+      showError("Hill Cipher hanya mendukung file teks, bukan file binary");
+      return;
+    }
+
+    const cleanTextValue = inputData.content.toUpperCase().replace(/[^A-Z]/g, "");
+
+    if (!cleanTextValue) {
+      showError("Teks harus mengandung huruf untuk Hill Cipher");
+      return;
+    }
+
+    if (cleanTextValue.length % 2 !== 0) {
+      showError("Panjang teks huruf harus genap untuk Hill Cipher");
+      return;
+    }
+
+    const keyMatrix = [[key1, key2], [key3, key4]];
+    let det = (key1 * key4 - key2 * key3) % 26;
+    if (det < 0) det += 26;
+
+    if (gcd(det, 26) !== 1) {
+      showError("Determinan matriks kunci harus coprime dengan 26");
+      return;
+    }
+
+    const det_inv = modInverse(det, 26);
+    if (det_inv === null) {
+      showError("Tidak dapat menemukan invers modular untuk determinan");
+      return;
+    }
+
+    const adjugate = [[key4, -key2], [-key3, key1]];
+    const invMatrix = [
+      [(det_inv * adjugate[0][0]) % 26, (det_inv * adjugate[0][1]) % 26],
+      [(det_inv * adjugate[1][0]) % 26, (det_inv * adjugate[1][1]) % 26],
+    ];
+
+    // Ensure positive values
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) {
+        if (invMatrix[i][j] < 0) invMatrix[i][j] += 26;
+      }
+    }
+
+    let decryptedLetters = "";
+    for (let i = 0; i < cleanTextValue.length; i += 2) {
+      const block = [
+        cleanTextValue.charCodeAt(i) - 65,
+        cleanTextValue.charCodeAt(i + 1) - 65,
+      ];
+
+      const decryptedBlock = [
+        (invMatrix[0][0] * block[0] + invMatrix[0][1] * block[1]) % 26,
+        (invMatrix[1][0] * block[0] + invMatrix[1][1] * block[1]) % 26,
+      ];
+
+      decryptedLetters +=
+        String.fromCharCode(decryptedBlock[0] + 65) +
+        String.fromCharCode(decryptedBlock[1] + 65);
+    }
+
+    const resultTextarea = document.getElementById("hill-result");
+    resultTextarea.value = decryptedLetters;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text";
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat dekripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-// DIPERBAIKI: Permutation Cipher - HILANGKAN opsi pertahankan karakter non-alphabet
-function encryptPermutation() {
+// DIPERBAIKI: Permutation Cipher dengan file support (hanya untuk text files)
+async function encryptPermutation() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("permutation", "primary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("permutation-text").value;
-      const keyStr = document.getElementById("permutation-key").value;
+  try {
+    const inputData = await getInputContent("permutation");
+    const keyStr = document.getElementById("permutation-key").value;
 
-      // DIPERBAIKI: Permutation Cipher TIDAK menggunakan opsi preserveNonAlpha
-      // Langsung set ke false
-      const preserveNonAlpha = false;
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
+    }
 
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
-      }
+    // Permutation Cipher tidak mendukung binary files
+    if (inputData.isFile && inputData.fileType === "binary") {
+      showError("Permutation Cipher hanya mendukung file teks, bukan file binary");
+      return;
+    }
 
-      // parse key (as numbers)
-      const key = keyStr.split(",").map((s) => Number(s.trim()));
-      const n = key.length;
+    // parse key (as numbers)
+    const key = keyStr.split(",").map((s) => Number(s.trim()));
+    const n = key.length;
 
-      if (n < 2) {
-        showError("Kunci harus memiliki setidaknya 2 angka");
-        return;
-      }
+    if (n < 2) {
+      showError("Kunci harus memiliki setidaknya 2 angka");
+      return;
+    }
 
-      const sortedKey = [...key].sort((a, b) => a - b);
-      const expected = [...Array(n).keys()].map((x) => x + 1);
-      if (JSON.stringify(sortedKey) !== JSON.stringify(expected)) {
-        showError(`Kunci harus berisi angka 1 sampai ${n} tanpa pengulangan`);
-        return;
-      }
+    const sortedKey = [...key].sort((a, b) => a - b);
+    const expected = [...Array(n).keys()].map((x) => x + 1);
+    if (JSON.stringify(sortedKey) !== JSON.stringify(expected)) {
+      showError(`Kunci harus berisi angka 1 sampai ${n} tanpa pengulangan`);
+      return;
+    }
 
-      // DIPERBAIKI: Permutation Cipher hanya memproses huruf, tidak ada opsi preserve
-      const cleanTextValue = text.toUpperCase().replace(/[^A-Z]/g, "");
+    const cleanTextValue = inputData.content.toUpperCase().replace(/[^A-Z]/g, "");
 
-      if (!cleanTextValue) {
-        showError("Teks harus mengandung huruf untuk Permutation Cipher");
-        return;
-      }
+    if (!cleanTextValue) {
+      showError("Teks harus mengandung huruf untuk Permutation Cipher");
+      return;
+    }
 
-      let result = "";
+    let result = "";
+    const padding = (n - (cleanTextValue.length % n)) % n;
+    let processedText = cleanTextValue;
+    if (padding > 0) {
+      processedText += "X".repeat(padding);
+    }
 
-      // DIPERBAIKI: Permutation Cipher tidak mendukung preserve non-alpha
-      // Langsung proses teks yang sudah dibersihkan dari non-alpha
-      const padding = (n - (cleanTextValue.length % n)) % n;
-      let processedText = cleanTextValue;
-      if (padding > 0) {
-        processedText += "X".repeat(padding);
-      }
-
-      for (let i = 0; i < processedText.length; i += n) {
-        const block = processedText.substring(i, i + n);
-        for (let k = 0; k < n; k++) {
-          const colIndex = key[k] - 1;
-          if (colIndex < block.length) {
-            result += block[colIndex];
-          }
+    for (let i = 0; i < processedText.length; i += n) {
+      const block = processedText.substring(i, i + n);
+      for (let k = 0; k < n; k++) {
+        const colIndex = key[k] - 1;
+        if (colIndex < block.length) {
+          result += block[colIndex];
         }
       }
-
-      document.getElementById("permutation-result").value = result;
-      addSuccessAnimation(document.getElementById("permutation-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat enkripsi");
-    } finally {
-      setButtonLoading(button, false);
     }
-  }, 300);
+
+    const resultTextarea = document.getElementById("permutation-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text";
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat enkripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
-function decryptPermutation() {
+async function decryptPermutation() {
   const button =
     (typeof event !== "undefined" && event && event.target) ||
     getButtonFor("permutation", "secondary");
   setButtonLoading(button, true);
 
-  setTimeout(() => {
-    try {
-      const text = document.getElementById("permutation-text").value;
-      const keyStr = document.getElementById("permutation-key").value;
+  try {
+    const inputData = await getInputContent("permutation");
+    const keyStr = document.getElementById("permutation-key").value;
 
-      // DIPERBAIKI: Permutation Cipher TIDAK menggunakan opsi preserveNonAlpha
-      // Langsung set ke false
-      const preserveNonAlpha = false;
-
-      if (!text.trim()) {
-        showError("Masukkan teks terlebih dahulu");
-        return;
-      }
-
-      const key = keyStr.split(",").map((s) => Number(s.trim()));
-      const n = key.length;
-
-      if (n < 2) {
-        showError("Kunci harus memiliki setidaknya 2 angka");
-        return;
-      }
-
-      const sortedKey = [...key].sort((a, b) => a - b);
-      const expected = [...Array(n).keys()].map((x) => x + 1);
-      if (JSON.stringify(sortedKey) !== JSON.stringify(expected)) {
-        showError(`Kunci harus berisi angka 1 sampai ${n} tanpa pengulangan`);
-        return;
-      }
-
-      // DIPERBAIKI: Permutation Cipher hanya memproses huruf, tidak ada opsi preserve
-      const cleanTextValue = text.toUpperCase().replace(/[^A-Z]/g, "");
-
-      if (!cleanTextValue) {
-        showError("Teks harus mengandung huruf untuk Permutation Cipher");
-        return;
-      }
-
-      if (cleanTextValue.length % n !== 0) {
-        showError(`Panjang teks harus kelipatan dari ${n} (panjang kunci)`);
-        return;
-      }
-
-      let result = "";
-
-      // DIPERBAIKI: Permutation Cipher tidak mendukung preserve non-alpha
-      // Langsung proses teks yang sudah dibersihkan dari non-alpha
-      for (let i = 0; i < cleanTextValue.length; i += n) {
-        const block = cleanTextValue.substring(i, i + n);
-        const decryptedBlock = new Array(n);
-
-        for (let j = 0; j < n; j++) {
-          const targetIndex = key[j] - 1;
-          decryptedBlock[targetIndex] = block[j];
-        }
-
-        result += decryptedBlock.join("");
-      }
-
-      document.getElementById("permutation-result").value = result;
-      addSuccessAnimation(document.getElementById("permutation-result"));
-    } catch (error) {
-      showError("Terjadi kesalahan saat dekripsi");
-    } finally {
-      setButtonLoading(button, false);
+    if (!inputData.content || (typeof inputData.content === "string" && !inputData.content.trim())) {
+      showError("Masukkan teks atau pilih file terlebih dahulu");
+      return;
     }
-  }, 300);
+
+    // Permutation Cipher tidak mendukung binary files
+    if (inputData.isFile && inputData.fileType === "binary") {
+      showError("Permutation Cipher hanya mendukung file teks, bukan file binary");
+      return;
+    }
+
+    const key = keyStr.split(",").map((s) => Number(s.trim()));
+    const n = key.length;
+
+    if (n < 2) {
+      showError("Kunci harus memiliki setidaknya 2 angka");
+      return;
+    }
+
+    const sortedKey = [...key].sort((a, b) => a - b);
+    const expected = [...Array(n).keys()].map((x) => x + 1);
+    if (JSON.stringify(sortedKey) !== JSON.stringify(expected)) {
+      showError(`Kunci harus berisi angka 1 sampai ${n} tanpa pengulangan`);
+      return;
+    }
+
+    const cleanTextValue = inputData.content.toUpperCase().replace(/[^A-Z]/g, "");
+
+    if (!cleanTextValue) {
+      showError("Teks harus mengandung huruf untuk Permutation Cipher");
+      return;
+    }
+
+    if (cleanTextValue.length % n !== 0) {
+      showError(`Panjang teks harus kelipatan dari ${n} (panjang kunci)`);
+      return;
+    }
+
+    let result = "";
+    for (let i = 0; i < cleanTextValue.length; i += n) {
+      const block = cleanTextValue.substring(i, i + n);
+      const decryptedBlock = new Array(n);
+
+      for (let j = 0; j < n; j++) {
+        const targetIndex = key[j] - 1;
+        decryptedBlock[targetIndex] = block[j];
+      }
+
+      result += decryptedBlock.join("");
+    }
+
+    const resultTextarea = document.getElementById("permutation-result");
+    resultTextarea.value = result;
+
+    // Store metadata for saving
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text";
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    addSuccessAnimation(resultTextarea);
+  } catch (error) {
+    showError("Terjadi kesalahan saat dekripsi: " + error.message);
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
 // Add macOS-style interactions & init defaults
@@ -1276,7 +1353,7 @@ document.addEventListener("DOMContentLoaded", function () {
     textarea.style.height = "auto";
     textarea.style.height = textarea.scrollHeight + "px";
   });
-  
+
   // Setup file input listeners
   setupFileInputListeners();
 });
