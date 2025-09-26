@@ -8,8 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -95,8 +94,7 @@
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
-                                <textarea class="macos-textarea" id="shift-text"
-                                    placeholder="Masukkan teks di sini..."
+                                <textarea class="macos-textarea" id="shift-text" placeholder="Masukkan teks di sini..."
                                     style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
                             </label>
                             <button class="copy-btn" data-target="shift-text" title="Copy text">
@@ -182,9 +180,9 @@
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
-                                <textarea class="macos-textarea" id="substitution-text" 
-                                placeholder="Masukkan teks di sini..."
-                                style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                                <textarea class="macos-textarea" id="substitution-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
                             </label>
                             <button class="copy-btn" data-target="substitution-text" title="Copy text">
                                 <span class="copy-icon">📄</span>
@@ -268,8 +266,7 @@
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
-                                <textarea class="macos-textarea" id="affine-text"
-                                    placeholder="Masukkan teks di sini..."
+                                <textarea class="macos-textarea" id="affine-text" placeholder="Masukkan teks di sini..."
                                     style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
                             </label>
                             <button class="copy-btn" data-target="affine-text" title="Copy text">
@@ -444,8 +441,7 @@
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
-                                <textarea class="macos-textarea" id="hill-text"
-                                    placeholder="Masukkan teks di sini..."
+                                <textarea class="macos-textarea" id="hill-text" placeholder="Masukkan teks di sini..."
                                     style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
                             </label>
                             <button class="copy-btn" data-target="hill-text" title="Copy text">
@@ -576,13 +572,14 @@
             </div>
 
             <!-- Playfair Cipher Tab -->
-             <div id="playfair" class="tab-content">
+            <div id="playfair" class="tab-content">
                 <div class="cipher-card">
                     <div class="card-header">
                         <h2>Playfair Cipher (25 huruf)</h2>
                         <div class="pill">Digraph, 5×5</div>
                     </div>
-                    <p class="card-description">Playfair dengan semua 25 huruf (grid 5×5 dan I=J). Masukkan optional keyword (huruf unik) untuk membuat matrix.</p>
+                    <p class="card-description">Playfair dengan semua 25 huruf (grid 5×5 dan I=J). Masukkan optional
+                        keyword (huruf unik) untuk membuat matrix.</p>
 
                     <div class="input-section">
                         <div class="file-input-section">
@@ -590,50 +587,55 @@
                                 <span class="label-text">Input File (Optional)</span>
                                 <div class="file-input-wrapper">
                                     <input type="file" class="file-input" id="playfair-file" accept="*/*">
-                                    <button type="button" class="file-select-btn" onclick="document.getElementById('playfair-file').click()">📁 Choose File</button>
-                                <span class="file-info" id="playfair-file-info">No file selected</span>
-                            </div>
-                        </label>
-                    </div>
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('playfair-file').click()">📁 Choose
+                                        File</button>
+                                    <span class="file-info" id="playfair-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
 
-                    <div class="input-with-copy">
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="playfair-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="playfair-text" title="Copy text">📄</button>
+                        </div>
+
+                        <div class="output-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="playfair-preserve">
+                                <span class="checkmark"></span>
+                                Pertahankan karakter non-alfabet
+                            </label>
+                        </div>
+
                         <label class="input-label">
-                        <span class="label-text">Plaintext/Ciphertext</span>
-                        <textarea class="macos-textarea" id="playfair-text" placeholder="Masukkan teks di sini..." style="min-height:120px"></textarea>
+                            <span class="label-text">Keyword (opsional, letters only)</span>
+                            <input type="text" class="macos-input" id="playfair-key" placeholder="Contoh: CRYPTO">
                         </label>
-                        <button class="copy-btn" data-target="playfair-text" title="Copy text">📄</button>
-                    </div>
-
-                    <div class="output-options">
-                        <label class="checkbox-label">
-                        <input type="checkbox" id="playfair-preserve">
-                        <span class="checkmark"></span>
-                        Pertahankan karakter non-alfabet
-                        </label>
-                    </div>
-
-                    <label class="input-label">
-                        <span class="label-text">Keyword (opsional, letters only)</span>
-                        <input type="text" class="macos-input" id="playfair-key" placeholder="Contoh: CRYPTO">
-                    </label>
                     </div>
 
                     <div class="button-group">
-                    <button onclick="encryptPlayfair()" class="macos-button primary">🔒 Enkripsi</button>
-                    <button onclick="decryptPlayfair()" class="macos-button secondary">🔓 Dekripsi</button>
+                        <button onclick="encryptPlayfair()" class="macos-button primary">🔒 Enkripsi</button>
+                        <button onclick="decryptPlayfair()" class="macos-button secondary">🔓 Dekripsi</button>
                     </div>
 
                     <div class="result-section">
-                    <div class="input-with-copy">
-                        <label class="input-label">
-                        <span class="label-text">Hasil</span>
-                        <textarea class="macos-textarea result" id="playfair-result" readonly placeholder="Hasil akan muncul..."></textarea>
-                        </label>
-                        <button class="copy-btn" data-target="playfair-result" title="Copy result">📄</button>
-                    </div>
-                    <div class="button-group">
-                        <button onclick="saveResult('playfair')" class="macos-button success">💾 Simpan</button>
-                    </div>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="playfair-result" readonly
+                                    placeholder="Hasil akan muncul..."></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="playfair-result" title="Copy result">📄</button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('playfair')" class="macos-button success">💾 Simpan</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -643,63 +645,70 @@
                 <div class="cipher-card">
                     <div class="card-header">
                         <h2>One-time Pad (A–Z)</h2>
-                    <div class="pill">Kunci dari file teks</div>
-                </div>
-                <p class="card-description">Kunci dibaca dari file teks yg berisi huruf A–Z acak (banyak huruf, mis. puluhan ribu). Hanya huruf A–Z yang dipakai; sisa file tidak terpakai.</p>
-
-                <div class="input-section">
-                <div class="file-input-section">
-                    <label class="file-input-label">
-                    <span class="label-text">Input File (Optional)</span>
-                    <div class="file-input-wrapper">
-                        <input type="file" class="file-input" id="otp-file" accept="*/*">
-                        <button type="button" class="file-select-btn" onclick="document.getElementById('otp-file').click()">📁 Choose File</button>
-                        <span class="file-info" id="otp-file-info">No file selected</span>
+                        <div class="pill">Kunci dari file teks</div>
                     </div>
-                    </label>
-                </div>
+                    <p class="card-description">Kunci dibaca dari file teks yg berisi huruf A–Z acak (banyak huruf, mis.
+                        puluhan ribu). Hanya huruf A–Z yang dipakai; sisa file tidak terpakai.</p>
 
-                <div class="input-with-copy">
-                    <label class="input-label">
-                    <span class="label-text">Plaintext/Ciphertext</span>
-                    <textarea class="macos-textarea" id="otp-text" placeholder="Masukkan teks di sini..." style="min-height:120px"></textarea>
-                    </label>
-                    <button class="copy-btn" data-target="otp-text" title="Copy text">📄</button>
-                </div>
+                    <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="otp-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('otp-file').click()">📁 Choose File</button>
+                                    <span class="file-info" id="otp-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
 
-                <div class="file-key-input key-management">
-                    <div>
-                    <label class="label-text">OTP Key File (teks, huruf acak)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" class="file-input" id="otp-key-file" accept=".txt">
-                        <button type="button" class="file-select-btn" onclick="document.getElementById('otp-key-file').click()">📁 Choose Key File</button>
-                        <span class="file-info" id="otp-key-file-info">No key selected</span>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="otp-text" placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="otp-text" title="Copy text">📄</button>
+                        </div>
+
+                        <div class="file-key-input key-management">
+                            <div>
+                                <label class="label-text">OTP Key File (teks, huruf acak)</label>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="otp-key-file" accept=".txt">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('otp-key-file').click()">📁 Choose Key
+                                        File</button>
+                                    <span class="file-info" id="otp-key-file-info">No key selected</span>
+                                </div>
+                            </div>
+                            <div class="key-info">Kunci akan dipakai sejauh panjang pesan (huruf). Sisanya tidak
+                                dipakai.</div>
+                        </div>
+
+
                     </div>
+
+                    <div class="button-group">
+                        <button onclick="encryptOTP()" class="macos-button primary">🔒 Enkripsi</button>
+                        <button onclick="decryptOTP()" class="macos-button secondary">🔓 Dekripsi</button>
                     </div>
-                    <div class="key-info">Kunci akan dipakai sejauh panjang pesan (huruf). Sisanya tidak dipakai.</div>
-                </div>
 
-
+                    <div class="result-section">
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="otp-result" readonly
+                                    placeholder="Hasil akan muncul..."></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="otp-result" title="Copy result">📄</button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('otp')" class="macos-button success">💾 Simpan</button>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="button-group">
-                <button onclick="encryptOTP()" class="macos-button primary">🔒 Enkripsi</button>
-                <button onclick="decryptOTP()" class="macos-button secondary">🔓 Dekripsi</button>
-                </div>
-
-                <div class="result-section">
-                <div class="input-with-copy">
-                    <label class="input-label">
-                    <span class="label-text">Hasil</span>
-                    <textarea class="macos-textarea result" id="otp-result" readonly placeholder="Hasil akan muncul..."></textarea>
-                    </label>
-                    <button class="copy-btn" data-target="otp-result" title="Copy result">📄</button>
-                </div>
-                <div class="button-group">
-                    <button onclick="saveResult('otp')" class="macos-button success">💾 Simpan</button>
-                </div>
-                </div>
-            </div>
             </div>
         </div>
     </div>
