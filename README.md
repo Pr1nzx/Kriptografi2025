@@ -7,10 +7,14 @@ Aplikasi berbasis website ini merupakan implementasi dari beberapa algoritma cip
 4. Vigenere Cipher
 5. Hill Cipher
 6. Permutation Cipher
+7. Playfair Cipher
+8. One-time Pad
 
 ## Preview Website
 Tampilan aplikasi web:  
-![Screenshot Website](img-readme/screenshot-web.jpeg)
+<p align="center">
+  <img src="img-readme/screenshot-web.jpeg" alt="Screenshot Website" width="600">
+</p>
 
 # Anggota Kelompok 8
 
@@ -21,7 +25,7 @@ Tampilan aplikasi web:
 | Ikhsan Ari Novianto      | <img src="https://github.com/ikhsannovianto.png" width="70" style="border-radius:50%"> | L0122077   | 2022     | <a href="https://github.com/ikhsannovianto" target="_blank">ikhsannovianto</a> |
 
 # Fitur Utama
-- 🔑 Mendukung berbagai algoritma cipher klasik (Shift, Substitution, Affine, Vigenere, Hill, Permutation).  
+- 🔑 Mendukung berbagai algoritma cipher klasik (Shift, Substitution, Affine, Vigenere, Hill, Permutation, Playfair, One-time Pad).  
 - 📝 Bisa memilih mode **Encrypt** dan **Decrypt**.  
 - 📋 Tersedia tombol **Copy Result** untuk menyalin hasil dengan cepat.  
 - 💾 Tersedia tombol **Save Result** untuk menyimpan hasil enkripsi/dekripsi.  
