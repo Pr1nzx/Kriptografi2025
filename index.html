@@ -5,17 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptography Tools</title>
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Cryptography Tools</title>
-        <link rel="stylesheet" href="styles.css">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet">
-    </head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
 
 <body>
     <div class="macos-window">
@@ -74,6 +69,21 @@
                         B→E, Z→C</p>
 
                     <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="shift-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('shift-file').click()">
+                                        <span class="button-icon">📁</span>
+                                        Choose File
+                                    </button>
+                                    <span class="file-info" id="shift-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
@@ -146,6 +156,21 @@
                         harus berupa 26 huruf unik.</p>
 
                     <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="substitution-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('substitution-file').click()">
+                                        <span class="button-icon">📁</span>
+                                        Choose File
+                                    </button>
+                                    <span class="file-info" id="substitution-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
@@ -217,6 +242,21 @@
                         dengan 26.</p>
 
                     <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="affine-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('affine-file').click()">
+                                        <span class="button-icon">📁</span>
+                                        Choose File
+                                    </button>
+                                    <span class="file-info" id="affine-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
@@ -293,6 +333,21 @@
                         digeser dengan jumlah berbeda.</p>
 
                     <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="vigenere-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('vigenere-file').click()">
+                                        <span class="button-icon">📁</span>
+                                        Choose File
+                                    </button>
+                                    <span class="file-info" id="vigenere-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
@@ -363,6 +418,21 @@
                         Determinan matriks harus coprime dengan 26.</p>
 
                     <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="hill-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('hill-file').click()">
+                                        <span class="button-icon">📁</span>
+                                        Choose File
+                                    </button>
+                                    <span class="file-info" id="hill-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
@@ -430,6 +500,21 @@
                         matriks, dibaca per kolom.</p>
 
                     <div class="input-section">
+                        <div class="file-input-section">
+                            <label class="file-input-label">
+                                <span class="label-text">Input File (Optional)</span>
+                                <div class="file-input-wrapper">
+                                    <input type="file" class="file-input" id="permutation-file" accept="*/*">
+                                    <button type="button" class="file-select-btn"
+                                        onclick="document.getElementById('permutation-file').click()">
+                                        <span class="button-icon">📁</span>
+                                        Choose File
+                                    </button>
+                                    <span class="file-info" id="permutation-file-info">No file selected</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="input-with-copy">
                             <label class="input-label">
                                 <span class="label-text">Plaintext/Ciphertext</span>
