@@ -111,6 +111,36 @@ function saveResult(cipherType) {
   saveResultWithType(cipherType, resultTextarea.value, isFile, fileType, originalFilename);
 }
 
+// script.js -> Tambahkan di bagian Utility functions
+
+function formatOutput(cipherType) {
+    const resultTextarea = document.getElementById(`${cipherType}-result`);
+    if (!resultTextarea) return;
+
+    // Ambil hasil mentah yang kita simpan sebelumnya
+    const rawResult = resultTextarea.dataset.rawResult || '';
+    if (!rawResult) {
+        resultTextarea.value = ''; // Kosongkan jika tidak ada hasil
+        return;
+    }
+
+    // Jangan format jika hasilnya adalah file biner
+    if (resultTextarea.dataset.fileType === 'binary') {
+        resultTextarea.value = rawResult;
+        return;
+    }
+
+    const selectedFormat = document.querySelector(`input[name="${cipherType}-format"]:checked`);
+    const format = selectedFormat ? selectedFormat.value : 'plain';
+
+    if (format === 'group5') {
+        const noSpaces = rawResult.replace(/\s/g, ''); // Hapus spasi dulu
+        resultTextarea.value = noSpaces.match(/.{1,5}/g)?.join(' ') || '';
+    } else { // 'plain'
+        resultTextarea.value = rawResult.replace(/\s/g, ''); // Tampilkan tanpa spasi
+    }
+}
+
 function showError(message) {
   // Buat notifikasi error style macOS
   const notification = document.createElement("div");
@@ -370,38 +400,62 @@ async function getInputContent(tabId) {
   }
 }
 
-// Save result with proper handling for binary files
 function saveResultWithType(cipherType, content, isFile, fileType, originalFilename) {
-  if (!content || (typeof content === "string" && !content.trim())) {
-    showError("Tidak ada hasil untuk disimpan");
-    return;
-  }
+    if (!content || (typeof content === "string" && !content.trim())) {
+        showError("Tidak ada hasil untuk disimpan");
+        return;
+    }
 
-  let blob;
-  let filename;
+    const resultTextarea = document.getElementById(`${cipherType}-result`);
+    const isDecryption = resultTextarea.dataset.isDecryption === "true";
+    let filename;
 
-  if (isFile && fileType === "binary") {
-    // Convert base64 back to binary
-    const arrayBuffer = base64ToArrayBuffer(content);
-    blob = new Blob([arrayBuffer], { type: "application/octet-stream" });
-    const ext = originalFilename ? originalFilename.split(".").pop() : "bin";
-    filename = `cipher_result_${cipherType}.${ext}`;
-  } else {
-    // Text content
-    blob = new Blob([content], { type: "text/plain" });
-    filename = `cipher_result_${cipherType}.txt`;
-  }
+    if (isDecryption && isFile && originalFilename) {
+        // KASUS 1: Dekripsi file -> coba kembalikan nama asli
+        // Contoh: "laporan_encrypted_vigenere.txt" -> "decrypted_laporan.txt"
+        let restoredName = originalFilename.replace(`_encrypted_${cipherType}`, '');
+        
+        // Jika penggantian tidak terjadi (misal, nama file tidak cocok pola),
+        // tetap gunakan nama file ciphertext sebagai dasar.
+        if (restoredName === originalFilename) {
+            filename = `decrypted_${originalFilename}`;
+        } else {
+            filename = `decrypted_${restoredName}`;
+        }
 
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    } else if (!isDecryption && isFile && originalFilename) {
+        // KASUS 2: Enkripsi file -> tambahkan suffix sebelum ekstensi
+        // Contoh: "laporan.txt" -> "laporan_encrypted_vigenere.txt"
+        const parts = originalFilename.split('.');
+        const ext = parts.length > 1 ? parts.pop() : ''; // Ambil ekstensi asli
+        const baseName = parts.join('.');
+        filename = `${baseName}_encrypted_${cipherType}${ext ? '.' + ext : ''}`;
 
-  showSuccess(`Hasil berhasil disimpan sebagai ${filename}`);
+    } else {
+        // KASUS 3: Operasi dari/ke textarea (tidak ada file asli)
+        const prefix = isDecryption ? 'decrypted' : 'encrypted';
+        filename = `${prefix}_${cipherType}_result.txt`;
+    }
+    // --- AKHIR LOGIKA PENAMAAN FILE ---
+
+    let blob;
+    if (isFile && fileType === "binary") {
+        const arrayBuffer = base64ToArrayBuffer(content);
+        blob = new Blob([arrayBuffer], { type: "application/octet-stream" });
+    } else {
+        blob = new Blob([resultTextarea.value], { type: "text/plain" });
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showSuccess(`Hasil berhasil disimpan sebagai ${filename}`);
 }
 
 // Add file input event listeners
@@ -505,13 +559,16 @@ async function encryptShift() {
     }
 
     const resultTextarea = document.getElementById("shift-result");
-    resultTextarea.value = result;
+    resultTextarea.dataset.rawResult = result;
 
-    // Store metadata for saving
+    // 2. Simpan metadata file
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
     resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false"; // Tandai sebagai hasil enkripsi
 
+    // 3. Panggil fungsi formatOutput untuk tampilan awal
+    formatOutput('shift');
     addSuccessAnimation(resultTextarea);
   } catch (error) {
     showError("Terjadi kesalahan saat enkripsi: " + error.message);
@@ -567,11 +624,19 @@ async function decryptShift() {
     const resultTextarea = document.getElementById("shift-result");
     resultTextarea.value = result;
 
-    // Store metadata for saving
+    resultTextarea.dataset.rawResult = result; // Simpan hasil mentah juga
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || "";
 
+    // Tandai sebagai hasil dekripsi dan simpan nama file asli
+    if (inputData.isFile) {
+      resultTextarea.dataset.originalFilename = inputData.filename;
+      resultTextarea.dataset.isDecryption = "true";
+    } else {
+      resultTextarea.dataset.originalFilename = "";
+      resultTextarea.dataset.isDecryption = "true"; // Tetap tandai sbg dekripsi
+    }
+    
     addSuccessAnimation(resultTextarea);
   } catch (error) {
     showError("Terjadi kesalahan saat dekripsi: " + error.message);
@@ -628,13 +693,16 @@ async function encryptSubstitution() {
     }
 
     const resultTextarea = document.getElementById("substitution-result");
-    resultTextarea.value = result;
+    resultTextarea.dataset.rawResult = result;
 
-    // Store metadata for saving
+    // 2. Simpan metadata file
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
     resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false"; // Tandai sebagai hasil enkripsi
 
+    // 3. Panggil fungsi formatOutput untuk tampilan awal
+    formatOutput('substitution');
     addSuccessAnimation(resultTextarea);
   } catch (error) {
     showError("Terjadi kesalahan saat enkripsi: " + error.message);
@@ -690,10 +758,18 @@ async function decryptSubstitution() {
     const resultTextarea = document.getElementById("substitution-result");
     resultTextarea.value = result;
 
-    // Store metadata for saving
+    resultTextarea.dataset.rawResult = result; // Simpan hasil mentah juga
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    // Tandai sebagai hasil dekripsi dan simpan nama file asli
+    if (inputData.isFile) {
+      resultTextarea.dataset.originalFilename = inputData.filename;
+      resultTextarea.dataset.isDecryption = "true";
+    } else {
+      resultTextarea.dataset.originalFilename = "";
+      resultTextarea.dataset.isDecryption = "true"; // Tetap tandai sbg dekripsi
+    }
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -756,12 +832,16 @@ async function encryptAffine() {
     }
 
     const resultTextarea = document.getElementById("affine-result");
-    resultTextarea.value = result;
+    resultTextarea.dataset.rawResult = result;
 
-    // Store metadata for saving
+    // 2. Simpan metadata file
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
     resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false"; // Tandai sebagai hasil enkripsi
+
+    // 3. Panggil fungsi formatOutput untuk tampilan awal
+    formatOutput('affine');
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -837,10 +917,18 @@ async function decryptAffine() {
     const resultTextarea = document.getElementById("affine-result");
     resultTextarea.value = result;
 
-    // Store metadata for saving
+    resultTextarea.dataset.rawResult = result; // Simpan hasil mentah juga
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    // Tandai sebagai hasil dekripsi dan simpan nama file asli
+    if (inputData.isFile) {
+      resultTextarea.dataset.originalFilename = inputData.filename;
+      resultTextarea.dataset.isDecryption = "true";
+    } else {
+      resultTextarea.dataset.originalFilename = "";
+      resultTextarea.dataset.isDecryption = "true"; // Tetap tandai sbg dekripsi
+    }
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -902,12 +990,16 @@ async function encryptVigenere() {
     }
 
     const resultTextarea = document.getElementById("vigenere-result");
-    resultTextarea.value = result;
+    resultTextarea.dataset.rawResult = result;
 
-    // Store metadata for saving
+    // 2. Simpan metadata file
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
     resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false"; // Tandai sebagai hasil enkripsi
+
+    // 3. Panggil fungsi formatOutput untuk tampilan awal
+    formatOutput('vigenere');
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -970,10 +1062,18 @@ async function decryptVigenere() {
     const resultTextarea = document.getElementById("vigenere-result");
     resultTextarea.value = result;
 
-    // Store metadata for saving
+    resultTextarea.dataset.rawResult = result; // Simpan hasil mentah juga
     resultTextarea.dataset.isFile = inputData.isFile.toString();
     resultTextarea.dataset.fileType = inputData.fileType;
-    resultTextarea.dataset.originalFilename = inputData.filename || "";
+
+    // Tandai sebagai hasil dekripsi dan simpan nama file asli
+    if (inputData.isFile) {
+      resultTextarea.dataset.originalFilename = inputData.filename;
+      resultTextarea.dataset.isDecryption = "true";
+    } else {
+      resultTextarea.dataset.originalFilename = "";
+      resultTextarea.dataset.isDecryption = "true"; // Tetap tandai sbg dekripsi
+    }
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -1048,12 +1148,16 @@ async function encryptHill() {
     }
 
     const resultTextarea = document.getElementById("hill-result");
-    resultTextarea.value = encryptedLetters;
+    resultTextarea.dataset.rawResult = result;
 
-    // Store metadata for saving
+    // 2. Simpan metadata file
     resultTextarea.dataset.isFile = inputData.isFile.toString();
-    resultTextarea.dataset.fileType = "text";
+    resultTextarea.dataset.fileType = inputData.fileType;
     resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false"; // Tandai sebagai hasil enkripsi
+
+    // 3. Panggil fungsi formatOutput untuk tampilan awal
+    formatOutput('hill');
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -1147,10 +1251,18 @@ async function decryptHill() {
     const resultTextarea = document.getElementById("hill-result");
     resultTextarea.value = decryptedLetters;
 
-    // Store metadata for saving
+    resultTextarea.dataset.rawResult = result; // Simpan hasil mentah juga
     resultTextarea.dataset.isFile = inputData.isFile.toString();
-    resultTextarea.dataset.fileType = "text";
-    resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.fileType = inputData.fileType;
+
+    // Tandai sebagai hasil dekripsi dan simpan nama file asli
+    if (inputData.isFile) {
+      resultTextarea.dataset.originalFilename = inputData.filename;
+      resultTextarea.dataset.isDecryption = "true";
+    } else {
+      resultTextarea.dataset.originalFilename = "";
+      resultTextarea.dataset.isDecryption = "true"; // Tetap tandai sbg dekripsi
+    }
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -1223,12 +1335,16 @@ async function encryptPermutation() {
     }
 
     const resultTextarea = document.getElementById("permutation-result");
-    resultTextarea.value = result;
+    resultTextarea.dataset.rawResult = result;
 
-    // Store metadata for saving
+    // 2. Simpan metadata file
     resultTextarea.dataset.isFile = inputData.isFile.toString();
-    resultTextarea.dataset.fileType = "text";
+    resultTextarea.dataset.fileType = inputData.fileType;
     resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false"; // Tandai sebagai hasil enkripsi
+
+    // 3. Panggil fungsi formatOutput untuk tampilan awal
+    formatOutput('permutation');
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -1302,10 +1418,18 @@ async function decryptPermutation() {
     const resultTextarea = document.getElementById("permutation-result");
     resultTextarea.value = result;
 
-    // Store metadata for saving
+    resultTextarea.dataset.rawResult = result; // Simpan hasil mentah juga
     resultTextarea.dataset.isFile = inputData.isFile.toString();
-    resultTextarea.dataset.fileType = "text";
-    resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.fileType = inputData.fileType;
+
+    // Tandai sebagai hasil dekripsi dan simpan nama file asli
+    if (inputData.isFile) {
+      resultTextarea.dataset.originalFilename = inputData.filename;
+      resultTextarea.dataset.isDecryption = "true";
+    } else {
+      resultTextarea.dataset.originalFilename = "";
+      resultTextarea.dataset.isDecryption = "true"; // Tetap tandai sbg dekripsi
+    }
 
     addSuccessAnimation(resultTextarea);
   } catch (error) {
@@ -1439,6 +1563,7 @@ function playfairProcess(text, keyword, encrypt = true, preserveNonAlpha = false
   }
 }
 
+// Ganti fungsi encryptPlayfair yang lama dengan ini
 async function encryptPlayfair() {
   const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("playfair", "primary");
   setButtonLoading(button, true);
@@ -1456,13 +1581,20 @@ async function encryptPlayfair() {
       return;
     }
 
-    const res = playfairProcess(inputData.content, key, true, preserve);
-    const ta = document.getElementById("playfair-result");
-    ta.value = res;
-    ta.dataset.isFile = inputData.isFile.toString();
-    ta.dataset.fileType = "text";
-    ta.dataset.originalFilename = inputData.filename || "";
-    addSuccessAnimation(ta);
+    const result = playfairProcess(inputData.content, key, true, preserve);
+    const resultTextarea = document.getElementById("playfair-result");
+
+    // --- PERUBAHAN DI SINI ---
+    resultTextarea.dataset.rawResult = result;
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text"; // Playfair selalu menghasilkan teks
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false";
+
+    formatOutput('playfair');
+    // --- AKHIR PERUBAHAN ---
+
+    addSuccessAnimation(resultTextarea);
   } catch (err) {
     showError("Error Playfair: " + err.message);
   } finally {
@@ -1470,6 +1602,7 @@ async function encryptPlayfair() {
   }
 }
 
+// Ganti fungsi decryptPlayfair yang lama dengan ini
 async function decryptPlayfair() {
   const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("playfair", "secondary");
   setButtonLoading(button, true);
@@ -1487,13 +1620,25 @@ async function decryptPlayfair() {
       return;
     }
 
-    const res = playfairProcess(inputData.content, key, false, preserve);
-    const ta = document.getElementById("playfair-result");
-    ta.value = res;
-    ta.dataset.isFile = inputData.isFile.toString();
-    ta.dataset.fileType = "text";
-    ta.dataset.originalFilename = inputData.filename || "";
-    addSuccessAnimation(ta);
+    const result = playfairProcess(inputData.content, key, false, preserve);
+    const resultTextarea = document.getElementById("playfair-result");
+
+    // --- PERUBAHAN DI SINI ---
+    resultTextarea.value = result; // Hasil dekripsi tidak perlu diformat
+    resultTextarea.dataset.rawResult = result;
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text";
+
+    if (inputData.isFile) {
+        resultTextarea.dataset.originalFilename = inputData.filename;
+        resultTextarea.dataset.isDecryption = "true";
+    } else {
+        resultTextarea.dataset.originalFilename = "";
+        resultTextarea.dataset.isDecryption = "true";
+    }
+    // --- AKHIR PERUBAHAN ---
+
+    addSuccessAnimation(resultTextarea);
   } catch (err) {
     showError("Error Playfair: " + err.message);
   } finally {
@@ -1532,6 +1677,7 @@ function applyOTPOnLettersOnly(lettersOnlyText, keyLetters, encrypt = true) {
   return outArr.join("");
 }
 
+// Ganti fungsi encryptOTP yang lama dengan ini
 async function encryptOTP() {
   const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("otp", "primary");
   setButtonLoading(button, true);
@@ -1548,10 +1694,7 @@ async function encryptOTP() {
       return;
     }
 
-    // 1. Bersihkan plaintext dari non-huruf, TAPI PERTAHANKAN CASE ASLINYA
     const plaintext = inputData.content.replace(/[^a-zA-Z]/g, '');
-
-    // 2. Bersihkan dan ubah kunci menjadi uppercase
     const keyData = await readFileContent(keyFileInput.files[0]);
     const key = keyData.content.toUpperCase().replace(/[^A-Z]/g, '');
 
@@ -1565,25 +1708,26 @@ async function encryptOTP() {
     let result = "";
     for (let i = 0; i < plaintext.length; i++) {
       const p_char = plaintext[i];
-      const k_val = key.charCodeAt(i) - 65; // Nilai kunci (0-25)
-
-      // Tentukan base ASCII ('A' atau 'a') berdasarkan case plaintext
+      const k_val = key.charCodeAt(i) - 65;
       const p_base = (p_char === p_char.toUpperCase()) ? 65 : 97;
       const p_val = p_char.charCodeAt(0) - p_base;
-
-      // Lakukan enkripsi
       const c_val = (p_val + k_val) % 26;
-
-      // Gabungkan kembali dengan base untuk mempertahankan case
       result += String.fromCharCode(c_val + p_base);
     }
 
-    const ta = document.getElementById("otp-result");
-    ta.value = result;
-    ta.dataset.isFile = "false";
-    ta.dataset.fileType = "text";
-    ta.dataset.originalFilename = inputData.filename || "";
-    addSuccessAnimation(ta);
+    const resultTextarea = document.getElementById("otp-result");
+
+    // --- PERUBAHAN DI SINI ---
+    resultTextarea.dataset.rawResult = result;
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text"; // OTP selalu menghasilkan teks
+    resultTextarea.dataset.originalFilename = inputData.filename || "";
+    resultTextarea.dataset.isDecryption = "false";
+
+    formatOutput('otp');
+    // --- AKHIR PERUBAHAN ---
+    
+    addSuccessAnimation(resultTextarea);
 
   } catch (err) {
     showError("Error Enkripsi: " + err.message);
@@ -1592,6 +1736,7 @@ async function encryptOTP() {
   }
 }
 
+// Ganti fungsi decryptOTP yang lama dengan ini
 async function decryptOTP() {
   const button = (typeof event !== "undefined" && event && event.target) || getButtonFor("otp", "secondary");
   setButtonLoading(button, true);
@@ -1608,10 +1753,7 @@ async function decryptOTP() {
       return;
     }
 
-    // 1. Bersihkan ciphertext dari non-huruf, TAPI PERTAHANKAN CASE ASLINYA
     const ciphertext = inputData.content.replace(/[^a-zA-Z]/g, '');
-    
-    // 2. Bersihkan dan ubah kunci menjadi uppercase
     const keyData = await readFileContent(keyFileInput.files[0]);
     const key = keyData.content.toUpperCase().replace(/[^A-Z]/g, '');
 
@@ -1626,24 +1768,30 @@ async function decryptOTP() {
     for (let i = 0; i < ciphertext.length; i++) {
       const c_char = ciphertext[i];
       const k_val = key.charCodeAt(i) - 65;
-
-      // Tentukan base ASCII ('A' atau 'a') berdasarkan case ciphertext
       const c_base = (c_char === c_char.toUpperCase()) ? 65 : 97;
       const c_val = c_char.charCodeAt(0) - c_base;
-
-      // Lakukan dekripsi
       const p_val = (c_val - k_val + 26) % 26;
-      
-      // Gabungkan kembali dengan base untuk mempertahankan case
       result += String.fromCharCode(p_val + c_base);
     }
 
-    const ta = document.getElementById("otp-result");
-    ta.value = result;
-    ta.dataset.isFile = "false";
-    ta.dataset.fileType = "text";
-    ta.dataset.originalFilename = inputData.filename || "";
-    addSuccessAnimation(ta);
+    const resultTextarea = document.getElementById("otp-result");
+
+    // --- PERUBAHAN DI SINI ---
+    resultTextarea.value = result; // Hasil dekripsi tidak perlu diformat
+    resultTextarea.dataset.rawResult = result;
+    resultTextarea.dataset.isFile = inputData.isFile.toString();
+    resultTextarea.dataset.fileType = "text";
+
+    if (inputData.isFile) {
+        resultTextarea.dataset.originalFilename = inputData.filename;
+        resultTextarea.dataset.isDecryption = "true";
+    } else {
+        resultTextarea.dataset.originalFilename = "";
+        resultTextarea.dataset.isDecryption = "true";
+    }
+    // --- AKHIR PERUBAHAN ---
+
+    addSuccessAnimation(resultTextarea);
     
   } catch (err) {
     showError("Error Dekripsi: " + err.message);
