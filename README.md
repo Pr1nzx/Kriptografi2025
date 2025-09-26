@@ -12,7 +12,7 @@ Aplikasi berbasis website ini merupakan implementasi dari beberapa algoritma cip
 
 ## Preview Website
 Tampilan aplikasi web:  
-<p align="center">
+<p>
   <img src="img-readme/screenshot-web.jpeg" alt="Screenshot Website" width="600">
 </p>
 
