@@ -5,11 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptography Tools</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cryptography Tools</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+    </head>
 
 <body>
     <div class="macos-window">
@@ -68,11 +74,25 @@
                         B→E, Z→C</p>
 
                     <div class="input-section">
-                        <label class="input-label">
-                            <span class="label-text">Plaintext/Ciphertext</span>
-                            <textarea class="macos-textarea" id="shift-text"
-                                placeholder="Masukkan teks di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="shift-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="shift-text" title="Copy text">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+
+                        <div class="output-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preserve-non-alpha">
+                                <span class="checkmark"></span>
+                                Pertahankan karakter non-alfabet
+                            </label>
+                        </div>
 
                         <div class="inline-inputs">
                             <label class="input-label">
@@ -94,11 +114,23 @@
                     </div>
 
                     <div class="result-section">
-                        <label class="input-label">
-                            <span class="label-text">Hasil</span>
-                            <textarea class="macos-textarea result" id="shift-result" readonly
-                                placeholder="Hasil akan muncul di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="shift-result" readonly
+                                    placeholder="Hasil akan muncul di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="shift-result" title="Copy result">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('shift')" class="macos-button success">
+                                <span class="button-icon">💾</span>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -114,11 +146,25 @@
                         harus berupa 26 huruf unik.</p>
 
                     <div class="input-section">
-                        <label class="input-label">
-                            <span class="label-text">Plaintext/Ciphertext</span>
-                            <textarea class="macos-textarea" id="substitution-text"
-                                placeholder="Masukkan teks di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="substitution-text" 
+                                placeholder="Masukkan teks di sini..."
+                                style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="substitution-text" title="Copy text">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+
+                        <div class="output-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preserve-non-alpha">
+                                <span class="checkmark"></span>
+                                Pertahankan karakter non-alfabet
+                            </label>
+                        </div>
 
                         <label class="input-label">
                             <span class="label-text">Substitution Key (26 unique letters)</span>
@@ -139,11 +185,23 @@
                     </div>
 
                     <div class="result-section">
-                        <label class="input-label">
-                            <span class="label-text">Hasil</span>
-                            <textarea class="macos-textarea result" id="substitution-result" readonly
-                                placeholder="Hasil akan muncul di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="substitution-result" readonly
+                                    placeholder="Hasil akan muncul di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="substitution-result" title="Copy result">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('substitution')" class="macos-button success">
+                                <span class="button-icon">💾</span>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,11 +217,25 @@
                         dengan 26.</p>
 
                     <div class="input-section">
-                        <label class="input-label">
-                            <span class="label-text">Plaintext/Ciphertext</span>
-                            <textarea class="macos-textarea" id="affine-text"
-                                placeholder="Masukkan teks di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="affine-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="affine-text" title="Copy text">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+
+                        <div class="output-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preserve-non-alpha">
+                                <span class="checkmark"></span>
+                                Pertahankan karakter non-alfabet
+                            </label>
+                        </div>
 
                         <div class="inline-inputs">
                             <label class="input-label">
@@ -189,11 +261,23 @@
                     </div>
 
                     <div class="result-section">
-                        <label class="input-label">
-                            <span class="label-text">Hasil</span>
-                            <textarea class="macos-textarea result" id="affine-result" readonly
-                                placeholder="Hasil akan muncul di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="affine-result" readonly
+                                    placeholder="Hasil akan muncul di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="affine-result" title="Copy result">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('affine')" class="macos-button success">
+                                <span class="button-icon">💾</span>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -209,11 +293,25 @@
                         digeser dengan jumlah berbeda.</p>
 
                     <div class="input-section">
-                        <label class="input-label">
-                            <span class="label-text">Plaintext/Ciphertext</span>
-                            <textarea class="macos-textarea" id="vigenere-text"
-                                placeholder="Masukkan teks di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="vigenere-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="vigenere-text" title="Copy text">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+
+                        <div class="output-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preserve-non-alpha">
+                                <span class="checkmark"></span>
+                                Pertahankan karakter non-alfabet
+                            </label>
+                        </div>
 
                         <label class="input-label">
                             <span class="label-text">Keyword (letters only)</span>
@@ -233,11 +331,23 @@
                     </div>
 
                     <div class="result-section">
-                        <label class="input-label">
-                            <span class="label-text">Hasil</span>
-                            <textarea class="macos-textarea result" id="vigenere-result" readonly
-                                placeholder="Hasil akan muncul di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="vigenere-result" readonly
+                                    placeholder="Hasil akan muncul di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="vigenere-result" title="Copy result">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('vigenere')" class="macos-button success">
+                                <span class="button-icon">💾</span>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -253,14 +363,20 @@
                         Determinan matriks harus coprime dengan 26.</p>
 
                     <div class="input-section">
-                        <label class="input-label">
-                            <span class="label-text">Plaintext/Ciphertext</span>
-                            <textarea class="macos-textarea" id="hill-text"
-                                placeholder="Masukkan teks di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="hill-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="hill-text" title="Copy text">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
 
                         <div class="matrix-input">
-                            <span class="label-text">Matrix Key 2×2</span>
+                            <span class="labelt-text">Matrix Key 2×2</span>
                             <div class="matrix-grid">
                                 <input type="number" class="macos-input matrix-cell" id="hill-key-1" value="5">
                                 <input type="number" class="macos-input matrix-cell" id="hill-key-2" value="8">
@@ -282,11 +398,23 @@
                     </div>
 
                     <div class="result-section">
-                        <label class="input-label">
-                            <span class="label-text">Hasil</span>
-                            <textarea class="macos-textarea result" id="hill-result" readonly
-                                placeholder="Hasil akan muncul di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="hill-result" readonly
+                                    placeholder="Hasil akan muncul di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="hill-result" title="Copy result">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('hill')" class="macos-button success">
+                                <span class="button-icon">💾</span>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -302,11 +430,17 @@
                         matriks, dibaca per kolom.</p>
 
                     <div class="input-section">
-                        <label class="input-label">
-                            <span class="label-text">Plaintext/Ciphertext</span>
-                            <textarea class="macos-textarea" id="permutation-text"
-                                placeholder="Masukkan teks di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Plaintext/Ciphertext</span>
+                                <textarea class="macos-textarea" id="permutation-text"
+                                    placeholder="Masukkan teks di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="permutation-text" title="Copy text">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
 
                         <label class="input-label">
                             <span class="label-text">Permutation Key (e.g., 3,1,2)</span>
@@ -327,15 +461,33 @@
                     </div>
 
                     <div class="result-section">
-                        <label class="input-label">
-                            <span class="label-text">Hasil</span>
-                            <textarea class="macos-textarea result" id="permutation-result" readonly
-                                placeholder="Hasil akan muncul di sini..."></textarea>
-                        </label>
+                        <div class="input-with-copy">
+                            <label class="input-label">
+                                <span class="label-text">Hasil</span>
+                                <textarea class="macos-textarea result" id="permutation-result" readonly
+                                    placeholder="Hasil akan muncul di sini..."
+                                    style="min-height: 120px; max-height: 300px; overflow-y: auto; resize: none;"></textarea>
+                            </label>
+                            <button class="copy-btn" data-target="permutation-result" title="Copy result">
+                                <span class="copy-icon">📄</span>
+                            </button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveResult('permutation')" class="macos-button success">
+                                <span class="button-icon">💾</span>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="copy-notification" class="copy-notification">
+        <span class="notification-icon">✓</span>
+        <span class="notification-text">Copied to clipboard!</span>
     </div>
 
     <script src="script.js"></script>
